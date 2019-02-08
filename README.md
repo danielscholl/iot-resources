@@ -1,8 +1,29 @@
 # iot-x509-testing
 
+The purpose of this solution is to be able to test x509 certificates with self 509 certs signed by an Intermediate CA.  It uses the base of the scripts provided in the azure-iot-sdk which is a solution not recommended to be used in a production scenario and for testing purposes only.
+
+
 __PreRequisites__
 
-This sample requires the use of [direnv](https://direnv.net/) and creates an .envrc for use.
+Requires the use of [direnv](https://direnv.net/).
+Requires the use of Azure CLI
+
+
+## Provision the Azure Resources
+
+This script will generate the following resources in Azure.
+
+1. Key Vault
+
+1. IoT Hub
+
+1. Device Provisioning Service
+
+```bash
+./provision.sh
+```
+
+The script also will create a .envrc file that is then used in the next step.
 
 ```bash
 # Azure Resources
@@ -17,17 +38,20 @@ export ROOT_CA_PASSWORD="<password>"
 export INT_CA_PASSWORD="<password>"
 ```
 
-> The default CA ORGANIZATION is `testonly` if you wish to change this you must modify the following files:
+> The default ORGANIZATION is `testonly` if you wish to change this you must modify the following:
+  - .envrc
   - root_ca.dnf
   - intermediate_ca.dnf
 
-## Provision the Azure Resources
-
-```bash
-./provision.sh
-```
-
 ## Creating and upload the Root CA and Intermediate Certificates
+
+This script will create a Root and an Intermediate CA located in src/pki then perform the following actions.
+
+1. Upload the Certificates, Keys, and Passwords used to the KeyVault.
+
+1. Upload the Root and Intermediate CA certificates to the IoT Hub and validate them.
+
+1. Upload the Root and Intermediate CA certificates to the IoT DPS and validate them.
 
 ```bash
 ./init-ca.sh
