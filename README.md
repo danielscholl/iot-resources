@@ -2,7 +2,7 @@
 
 __PreRequisites__
 
-This sample requires the use of [direnv](https://direnv.net/) and setups a .envrc for use.
+This sample requires the use of [direnv](https://direnv.net/) and creates an .envrc for use.
 
 ```bash
 # Azure Resources
@@ -17,7 +17,7 @@ export ROOT_CA_PASSWORD="<password>"
 export INT_CA_PASSWORD="<password>"
 ```
 
-> The default Organization is `testonly` if you wish to change this you must modify the following files:
+> The default CA ORGANIZATION is `testonly` if you wish to change this you must modify the following files:
   - root_ca.dnf
   - intermediate_ca.dnf
 
@@ -33,11 +33,13 @@ export INT_CA_PASSWORD="<password>"
 ./init-ca.sh
 ```
 
-> KeyVault Issues
+### Current Issue List
+
+KeyVault Issues
   - [PEM Import Support](https://github.com/MicrosoftDocs/azure-docs/issues/23558)
   - [PFX Import Support](https://github.com/MicrosoftDocs/azure-docs/issues/16543)
 
-> DPS Issues
+DPS Issues
   - Creating Enrollment Groups
 
 -----------------------------------------------------------------
