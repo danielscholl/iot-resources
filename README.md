@@ -27,18 +27,24 @@ export INT_CA_PASSWORD="<password>"
 ./provision.sh
 ```
 
-### Creating and upload the Root CA and Intermediate Certificates
+## Creating and upload the Root CA and Intermediate Certificates
 
 ```bash
 ./init-ca.sh
 ```
 
-
-#### Storing CA Certificates and Private Keys in a Vault
-
 > KeyVault Issues
   - [PEM Import Support](https://github.com/MicrosoftDocs/azure-docs/issues/23558)
   - [PFX Import Support](https://github.com/MicrosoftDocs/azure-docs/issues/16543)
+
+> DPS Issues
+  - Creating Enrollment Groups
+
+-----------------------------------------------------------------
+
+### Working Notes
+
+#### Storing CA Certificates and Private Keys in a Vault
 
 
 ```bash
