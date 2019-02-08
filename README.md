@@ -6,7 +6,8 @@ The purpose of this solution is to be able to test x509 certificates with self 5
 __PreRequisites__
 
 Requires the use of [direnv](https://direnv.net/).
-Requires the use of Azure CLI
+
+Requires the use of [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
 
 
 ## Provision the Azure Resources
@@ -20,10 +21,11 @@ This script will generate the following resources in Azure.
 1. Device Provisioning Service
 
 ```bash
+# Provision the ARM Resources
 ./provision.sh
 ```
 
-The script also will create a .envrc file that is then used in the next step.
+The script creates an .envrc file to set environment variables used in creating the x509 certs.
 
 ```bash
 # Azure Resources
@@ -38,22 +40,26 @@ export ROOT_CA_PASSWORD="<password>"
 export INT_CA_PASSWORD="<password>"
 ```
 
-> The default ORGANIZATION is `testonly` if you wish to change this you must modify the following:
+> The default ORGANIZATION name is `testonly`.  These files have the reference to the organization.
   - .envrc
   - root_ca.dnf
   - intermediate_ca.dnf
 
+
 ## Creating and upload the Root CA and Intermediate Certificates
 
-This script will create a Root and an Intermediate CA located in src/pki then perform the following actions.
+This script initializes a Root and Intermediate CA for use.
+
+1. Creates x509 Certificates and Authorities in `./src/pki`
 
 1. Upload the Certificates, Keys, and Passwords used to the KeyVault.
 
-1. Upload the Root and Intermediate CA certificates to the IoT Hub and validate them.
+1. Uploads and Validates the Root and Intermediate CA certificates to the IoT Hub.
 
-1. Upload the Root and Intermediate CA certificates to the IoT DPS and validate them.
+1. Uploads and Validates the Root and Intermediate CA certificates to the IoT DPS.
 
 ```bash
+# Initializes a Root and Intermediate CA for use.
 ./init-ca.sh
 ```
 
@@ -70,82 +76,70 @@ DPS Issues
 
 ### Working Notes
 
-#### Storing CA Certificates and Private Keys in a Vault
-
-
-```bash
-# Option 1 -- Import PEM with private key
-cat "./src/pki/certs/${ORGANIZATION}.root.ca.cert.pem" "./src/pki/private/${ORGANIZATION}.root.ca.key.pem" > "./src/pki/private/${ORGANIZATION}.root.ca.certwithkey.pem"
-
-az keyvault certificate import \
-  --vault-name $VAULT \
-  --name "${ORGANIZATION}-root" \
-  --file "./src/pki/private/${ORGANIZATION}.root.ca.certwithkey.pem"
-
-# Option 1 Result
-PEM is in unexpected format
-
-# Option 2 - Import PFX certificate
-az keyvault certificate import \
-  --vault-name $VAULT \
-  --name "${ORGANIZATION}-root" \
-  --file "./src/pki/certs_pfx/${ORGANIZATION}.root.ca.cert.pfx"
-
-# Option 2 Result
-We could not parse the provided certificate as .pem or .pfx. Please verify the certificate with OpenSSL.
-```
-
-### Creating Device Certificates
-
-```bash
-# Creating a Edge Device Certificates
-NAME="edge-ubuntu"
-./generate.sh edge $NAME
-cat ./certs/$NAME.cert.pem ./certs/$ORGANIZATION.intermediate.cert.pem ./certs/$ORGANIZATION.root.ca.cert.pem > ./certs/$NAME-chain.cert.pem
-
-az keyvault certificate import --vault-name $VAULT --file "./certs_pfx/${NAME}.cert.pfx" --name $NAME --password $PASSWORD
-az keyvault key import --vault-name $VAULT --pem-file "./private/${NAME}.key.pem" --name "${NAME}-key"
-
-scp ./certs/$ORGANIZATION.root.ca.cert.pem $NAME:~/$ORGANIZATION.root.ca.cert.pem
-scp ./certs/$NAME.cert.pem $NAME:~/$NAME-chain.cert.pem
-scp ./private/$NAME.key.pem $NAME:~/$NAME.key.pem
-
-
-# Creating a Edge Device Certificates
-NAME="edge-windows"
-./generate.sh edge $NAME
-cat ./certs/$NAME.cert.pem ./certs/$ORGANIZATION.intermediate.cert.pem ./certs/$ORGANIZATION.root.ca.cert.pem > ./certs/$NAME-chain.cert.pem
-
-az keyvault certificate import --vault-name $VAULT --file "certs_pfx/${NAME}.cert.pfx" --name $NAME --password $PASSWORD
-az keyvault key import --vault-name $VAULT --pem-file "./private/${NAME}.key.pem" --name "${NAME}-key"
-
-
-
-# Creating a Device Certificates
-NAME="DirectDevice"
-./generate.sh device $NAME
-cat ./certs/$NAME.cert.pem ./certs/$ORGANIZATION.intermediate.cert.pem ./certs/$ORGANIZATION.root.ca.cert.pem > ./certs/$NAME-chain.cert.pem
-
-az keyvault certificate import --vault-name $VAULT --file "certs_pfx/${NAME}.cert.pfx" --name $NAME --password $PASSWORD
-az keyvault key import --vault-name $VAULT --pem-file "./private/${NAME}.key.pem" --name "${NAME}-key"
-```
-
 ### Creating Self Signed Device Certificates
 
 ```bash
-DEVICE="cli-device-509"
+DEVICE="cli-device-test"
 
 # Create  a Device with x509 Self Signed by Hub
-az iot hub device-identity create -n $HUB -d $DEVICE --am x509_thumbprint --valid-days 10
-
-az iot hub device-identity create -n $HUB -d $DEVICE --am x509_thumbprint --output-dir self_signed
-
+mkdir src/self
 az iot hub device-identity create \
   --hub-name $HUB \
   --device-id $DEVICE \
-  --auth-method x509_thumbprint \
-  --primary-thumbprint $Thumbprint \
-  --secondary-thumbprint $Thumbprint
+  --auth-method x509_thumbprint
+  --output-dir src/self \
+  --valid-days 10
 
-az iot hub device-identity create -n $HUB -d kv-device --am x509_thumbprint --ptp [Thumbprint 1] --stp [Thumbprint 2]
+```
+
+### Creating Intermediate CA Signed Device Certificates
+
+```bash
+NAME="DirectDevice"
+
+# Create a Device Certificates
+./generate.sh device $NAME
+
+# Create a Full Chain Certificate
+cat ./certs/$NAME.cert.pem ./certs/$ORGANIZATION.intermediate.cert.pem ./certs/$ORGANIZATION.root.ca.cert.pem > ./certs/$NAME-chain.cert.pem
+
+# Store the Edge Certificate in KeyVault
+az keyvault certificate import \
+  --vault-name $VAULT \
+  --file "certs_pfx/${NAME}.cert.pfx" \
+  --name $NAME --password $PASSWORD
+
+az keyvault key import \
+  --vault-name $VAULT \
+  --pem-file "./private/${NAME}.key.pem" \
+  --name "${NAME}-key"
+```
+
+### Creating Intermediate CA Signed Edge Device Certificates
+
+```bash
+# Create Edge Device Certificate
+NAME="edge-ubuntu"
+./src/generate.sh edge $NAME
+
+# Create a Full Chain Certificate
+cat ./certs/$NAME.cert.pem ./certs/$ORGANIZATION.intermediate.cert.pem ./certs/$ORGANIZATION.root.ca.cert.pem > ./certs/$NAME-chain.cert.pem
+
+# Store the Edge Certificate in KeyVault
+az keyvault certificate import \
+  --vault-name $VAULT \
+  --file "./certs_pfx/${NAME}.cert.pfx" \
+  --name $NAME \
+  --password $PASSWORD
+
+az keyvault key import \
+  --vault-name $VAULT \
+  --pem-file "./private/${NAME}.key.pem" \
+  --name "${NAME}-key"
+
+# Copy Edge Certificate to Edge Server
+EDGE_HOST="edge-ubuntu"
+scp ./certs/$ORGANIZATION.root.ca.cert.pem $EDGE_HOST:~/$ORGANIZATION.root.ca.cert.pem
+scp ./certs/$NAME.cert.pem $EDGE_HOST:~/$NAME-chain.cert.pem
+scp ./private/$NAME.key.pem $EDGE_HOST:~/$NAME.key.pem
 ```
