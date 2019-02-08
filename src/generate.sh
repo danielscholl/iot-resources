@@ -183,7 +183,7 @@ function generate_intermediate_ca()
     [ $? -eq 0 ] || exit $?
 
     printf "\n"
-    tput setaf 2; echo "\nRoot + Intermediate CA Chain Certificate Generated At:" ; tput sgr0
+    tput setaf 2; echo "Root + Intermediate CA Chain Certificate Generated At:" ; tput sgr0
     tput setaf 3; echo "------------------------------------------------------" ; tput sgr0
     echo "    ${intermediate_ca_dir}/certs/${ca_chain_prefix}.cert.pem"
 }
@@ -263,30 +263,8 @@ function generate_device_certificate_common()
             -export -out ${certificate_dir}/certs_pfx/${device_prefix}.cert.pfx
     [ $? -eq 0 ] || exit $?
 
-
-    printf "\n"
-    tput setaf 2; echo "${cert_type_diagnostic} PFX Certificate Generated At:" ; tput sgr0
-    tput setaf 3; echo "-----------------------------------------------------" ; tput sgr0
     echo "    ${certificate_dir}/certs_pfx/${device_prefix}.cert.pfx"
     [ $? -eq 0 ] || exit $?
-}
-
-###############################################################################
-# Generate a certificate for a leaf device
-# signed with either the root or intermediate cert.
-###############################################################################
-function generate_leaf_certificate()
-{
-    local common_name="${1}"
-    local device_prefix="${2}"
-    local certificate_dir="${3}"
-    local ca_password="${4}"
-    local openssl_config_file="${5}"
-
-    generate_device_certificate_common "${common_name}" "${device_prefix}" \
-                                       "${certificate_dir}" "${ca_password}" \
-                                       "${openssl_config_file}" "server_cert" \
-                                       "Leaf Device"
 }
 
 ###############################################################################
@@ -309,14 +287,14 @@ function prepare_filesystem()
     rm -rf ${root_ca_dir}/private
     rm -rf ${root_ca_dir}/certs
     rm -rf ${root_ca_dir}/certs_pfx
-    rm -rf ${root_ca_dir}/intermediateCerts
+    # rm -rf ${root_ca_dir}/intermediateCerts
     rm -rf ${root_ca_dir}/newcerts
 
     mkdir -p ${root_ca_dir}/csr
     mkdir -p ${root_ca_dir}/private
     mkdir -p ${root_ca_dir}/certs
     mkdir -p ${root_ca_dir}/certs_pfx
-    mkdir -p ${root_ca_dir}/intermediateCerts
+    # mkdir -p ${root_ca_dir}/intermediateCerts
     mkdir -p ${root_ca_dir}/newcerts
 
     rm -f ${root_ca_dir}/index.txt
@@ -337,6 +315,27 @@ function initial_cert_generation()
 }
 
 ###############################################################################
+# Generate a certificate for a leaf device
+# signed with either the root or intermediate cert.
+###############################################################################
+function generate_leaf_certificate()
+{
+    local common_name="${1}"
+    local device_prefix="${2}"
+    local certificate_dir="${3}"
+    local ca_password="${4}"
+    local openssl_config_file="${5}"
+
+    generate_device_certificate_common "${common_name}" \
+                                       "${device_prefix}" \
+                                       "${certificate_dir}" \
+                                       "${ca_password}" \
+                                       "${openssl_config_file}" \
+                                       "server_cert" \
+                                       "Leaf Device"
+}
+
+###############################################################################
 # Generates a certificate for verification, chained directly to the root.
 ###############################################################################
 function generate_verification_certificate()
@@ -351,10 +350,11 @@ function generate_verification_certificate()
       openssl_config_file=${openssl_intermediate_config_file}
     fi
 
-    rm -f ./private/${ORGANIZATION}-verify.key.pem
-    rm -f ./certs/${ORGANIZATION}-verify.cert.pem
-    rm -f ./certs_pfx/${ORGANIZATION}-verify.cert.pfx
-    rm -f ./csr/${ORGANIZATION}-verify.csr.pem
+    rm -f ./pki/private/${ORGANIZATION}-verify.key.pem
+    rm -f ./pki/certs/${ORGANIZATION}-verify.cert.pem
+    rm -f ./pki/certs_pfx/${ORGANIZATION}-verify.cert.pfx
+    rm -f ./pki/csr/${ORGANIZATION}-verify.csr.pem
+    grep -v ${1} ./pki/index.txt > ./pki/index.txt.old && cp ./pki/index.txt.old ./pki/index.txt
 
     generate_leaf_certificate "${1}" \
                               "${ORGANIZATION}-verify" \
@@ -373,17 +373,25 @@ function generate_device_certificate()
         exit 1
     fi
 
-    rm -f ./private/${device_prefix}.key.pem
-    rm -f ./certs/${device_prefix}.key.pem
-    rm -f ./certs/${device_prefix}-full-chain.cert.pem
+    local device_prefix="new-device"
+    if [ "$1" ]; then
+      device_prefix=$1
+    fi
 
-    generate_device_certificate_common ${1} \
+    rm -f ./pki/csr/${device_prefix}.csr.pem
+    rm -f ./pki/private/${device_prefix}.key.pem
+    rm -f ./pki/certs/${device_prefix}.cert.pem
+    rm -f ./pki/certs_pfx/${device_prefix}.cert.pfx
+    rm -f ./pki/certs/${device_prefix}-full-chain.cert.pem
+    grep -v ${device_prefix} ./pki/index.txt > ./pki/index.txt.old && cp ./pki/index.txt.old ./pki/index.txt
+
+    generate_device_certificate_common ${device_prefix} \
                                        ${device_prefix} \
                                        ${intermediate_ca_dir} \
                                        ${intermediate_ca_password} \
                                        ${openssl_intermediate_config_file} \
                                        "server_cert" \
-                                       "Leaf Device"
+                                       "Device"
 }
 
 ###############################################################################
@@ -391,14 +399,22 @@ function generate_device_certificate()
 ###############################################################################
 function generate_edge_device_certificate()
 {
+    if [ $# -ne 1 ]; then
+      echo "Usage: <subjectName>"
+      exit 1
+    fi
+
     local device_prefix="new-device"
     if [ "$1" ]; then
       device_prefix=$1
     fi
 
-    rm -f ./private/${device_prefix}.key.pem
-    rm -f ./certs/${device_prefix}.cert.pem
-    rm -f ./certs/${device_prefix}.-full-chain.cert.pem
+    rm -f ./pki/csr/${device_prefix}.csr.pem
+    rm -f ./pki/private/${device_prefix}.key.pem
+    rm -f ./pki/certs/${device_prefix}.cert.pem
+    rm -f ./pki/certs_pfx/${device_prefix}.cert.pfx
+    rm -f ./pki/certs/${device_prefix}.-full-chain.cert.pem
+    grep -v ${device_prefix} ./pki/index.txt > ./pki/index.txt.old && cp ./pki/index.txt.old ./pki/index.txt
 
     # Note: Appending a '.ca' to the common name is useful in situations
     # where a user names their hostname as the edge device name.
@@ -414,6 +430,36 @@ function generate_edge_device_certificate()
                                        "Edge Device"
 }
 
+###############################################################################
+# Generates a certificate for a leaf device, chained to the intermediate.
+###############################################################################
+function generate_leaf_device_certificate()
+{
+    if [ $# -ne 1 ]; then
+      echo "Usage: <subjectName>"
+      exit 1
+    fi
+
+    local device_prefix="new-leaf"
+    if [ "$1" ]; then
+      device_prefix=$1
+    fi
+
+    rm -f ./pki/csr/${device_prefix}.csr.pem
+    rm -f ./pki/private/${device_prefix}.key.pem
+    rm -f ./pki/certs/${device_prefix}.cert.pem
+    rm -f ./pki/certs_pfx/${device_prefix}.cert.pfx
+    rm -f ./pki/certs/${device_prefix}.-full-chain.cert.pem
+    grep -v ${device_prefix} ./pki/index.txt > ./pki/index.txt.old && cp ./pki/index.txt.old ./pki/index.txt
+
+    generate_leaf_certificate "${1}" \
+                              ${device_prefix} \
+                              ${intermediate_ca_dir} \
+                              ${intermediate_ca_password} \
+                              ${openssl_intermediate_config_file}
+}
+
+
 cd $home_dir
 
 if [ "${1}" == "ca" ]; then
@@ -426,12 +472,14 @@ elif [ "${1}" == "device" ]; then
     generate_device_certificate "${2}"
 elif [ "${1}" == "edge" ]; then
     generate_edge_device_certificate "${2}"
+elif [ "${1}" == "leaf" ]; then
+    generate_leaf_device_certificate "${2}"
 else
     echo "Usage: ca                                 # Creates a new root and intermediate certificates"
-    echo "       verify              <subjectName>  # Creates a verification certificate, signed with <subjectName>"
+    echo "       verify <subjectName>               # Creates a verification certificate, signed with <subjectName>"
     echo "       verify-intermediate <subjectName>  # Creates a verification certificate, signed with <subjectName>"
-    echo "       device              <subjectName>  # Creates a device certificate, signed with <subjectName>"
-    echo "       edge                <subjectName>  # Creates an edge device certificate, signed with <subjectName>"
-
+    echo "       device <subjectName>               # Creates a device certificate, signed with <subjectName>"
+    echo "       edge <subjectName>                 # Creates an edge device certificate, signed with <subjectName>"
+    echo "       leaf <subjectName>                 # Creates a leaf device certificate, signed with <subjectName>"
     exit 1
 fi

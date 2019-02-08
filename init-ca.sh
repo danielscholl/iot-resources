@@ -120,7 +120,7 @@ az iot hub certificate verify \
   --path src/pki/certs/${ORGANIZATION}-verify.cert.pem -ojson
 
 # Cleanup Here as generate.sh isn't doing this properly yet.  (Timing?)
-validate_cleanup
+# validate_cleanup
 
 
 #######################################
@@ -167,7 +167,7 @@ az iot hub certificate verify \
 
 
 # Cleanup Here as generate.sh isn't doing this properly yet.  (Timing?)
-validate_cleanup
+# validate_cleanup
 
 
 ##############################
@@ -218,7 +218,7 @@ az iot dps certificate verify \
   --path src/pki/certs/${ORGANIZATION}-verify.cert.pem -ojson
 
 # Cleanup Here as generate.sh isn't doing this properly yet.  (Timing?)
-validate_cleanup
+# validate_cleanup
 
 
 ####################################
@@ -269,7 +269,7 @@ az iot dps certificate verify \
   --path src/pki/certs/${ORGANIZATION}-verify.cert.pem -ojson
 
 # Cleanup Here as generate.sh isn't doing this properly yet.  (Timing?)
-validate_cleanup
+# validate_cleanup
 
 
 ##############################

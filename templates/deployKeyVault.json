@@ -36,6 +36,9 @@
               ],
               "secrets": [
                 "all"
+              ],
+              "certificates": [
+                "all"
               ]
             }
           }
