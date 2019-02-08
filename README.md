@@ -86,10 +86,16 @@ mkdir src/self
 az iot hub device-identity create \
   --hub-name $HUB \
   --device-id $DEVICE \
-  --auth-method x509_thumbprint
+  --auth-method x509_thumbprint \
   --output-dir src/self \
   --valid-days 10
 
+cat "./src/self/${DEVICE}-cert.pem" "./src/self/${DEVICE}-key.pem" > "./src/self/${DEVICE}.certwithkey.pem"
+
+az keyvault certificate import \
+  --vault-name $VAULT \
+  --name ${DEVICE} \
+  --file "src/self/${DEVICE}.certwithkey.pem"
 ```
 
 ### Creating Intermediate CA Signed Device Certificates
@@ -98,7 +104,7 @@ az iot hub device-identity create \
 NAME="DirectDevice"
 
 # Create a Device Certificates
-./generate.sh device $NAME
+./src/generate.sh device $NAME
 
 # Create a Full Chain Certificate
 cat ./certs/$NAME.cert.pem ./certs/$ORGANIZATION.intermediate.cert.pem ./certs/$ORGANIZATION.root.ca.cert.pem > ./certs/$NAME-chain.cert.pem
