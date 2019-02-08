@@ -1,0 +1,68 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {
+    "IotHubName": "[concat('hub', uniqueString(resourceGroup().id))]",
+    "IotHubId": "[resourceId('Microsoft.Devices/IotHubs', variables('IotHubName'))]",
+    "IotHubKeyName": "iothubowner",
+    "IotHubKeyResource": "[resourceId('Microsoft.Devices/Iothubs/Iothubkeys', variables('iotHubName'), variables('iotHubKeyName'))]",
+    "DpsName": "[concat('dps', uniqueString(resourceGroup().id))]",
+    "DpsId": "[resourceId('Microsoft.Devices/provisioningServices', variables('DpsName'))]"
+  },
+  "resources": [
+    {
+      "comments": "## IoT Hub ##",
+      "type": "Microsoft.Devices/IotHubs",
+      "name": "[variables('IotHubName')]",
+      "apiVersion": "2016-02-03",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "S1",
+        "tier": "Standard",
+        "capacity": 1
+      },
+      "properties": {
+        "location": "[resourceGroup().location]"
+      }
+    },
+    {
+      "comments": "## IoT Hub ##",
+      "type": "Microsoft.Devices/provisioningServices",
+      "name": "[variables('DpsName')]",
+      "apiVersion": "2017-11-15",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "S1",
+        "capacity": 1
+      },
+      "properties": {
+        "iotHubs": [
+          {
+            "connectionString": "[concat('HostName=', reference(variables('IotHubId')).hostName, ';SharedAccessKeyName=', variables('IotHubKeyName'), ';SharedAccessKey=', listkeys(variables('iotHubKeyResource'), '2017-07-01').primaryKey)]",
+            "location": "[resourceGroup().location]",
+            "name": "[concat(variables('IotHubName'),'.azure-devices.net')]"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[variables('IotHubName')]"
+      ]
+    }
+  ],
+  "outputs": {
+    "iotHub": {
+      "type": "object",
+      "value": {
+        "id": "[variables('IotHubId')]",
+        "keys": "[listKeys(resourceId('Microsoft.Devices/IotHubs', variables('IotHubName')), '2016-02-03')]"
+      }
+    },
+    "dps": {
+      "type": "object",
+      "value": {
+        "id": "[variables('DpsId')]"
+      }
+    }
+  }
+}

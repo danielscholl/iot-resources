@@ -1,0 +1,10 @@
+# Azure Resources
+export VAULT="<key_vault>"
+export HUB="<iot_hub>"
+export DPS="<iot_dps>"
+export DPS_GROUP="<resource_group>"
+
+# Certificate Authority
+export ORGANIZATION="<organization>"
+export ROOT_CA_PASSWORD="<password>"
+export INT_CA_PASSWORD="<password>"
