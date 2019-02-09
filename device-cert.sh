@@ -43,6 +43,13 @@ function generate_device_certificate()
   ./src/generate.sh device $1
   create_chain $1
   save_vault $1
+
+  # Create a Device Identity with a Self Signed x509
+  az iot hub device-identity create \
+    --hub-name $HUB \
+    --device-id $1 \
+    --auth-method x509_ca
+    -oyaml
 }
 
 function generate_edge_certificate()
