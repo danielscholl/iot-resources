@@ -9,7 +9,10 @@
 printf "\n"
 tput setaf 2; echo "Removing Azure Resource Group" ; tput sgr0
 tput setaf 3; echo "-----------------------------" ; tput sgr0
-az group delete $DPS_GROUP --no-wait
+az group delete \
+  --remove-group $DPS_GROUP \
+  --yes \
+  --no-wait
 
 
 # Remove the Private Key Folder
