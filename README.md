@@ -63,11 +63,27 @@ This script initializes a Root and Intermediate CA for use.
 ./init-ca.sh
 ```
 
-### Current Issue List
+## Creating and uploading Device Certificates
 
-KeyVault Issues
-  - [PEM Import Support](https://github.com/MicrosoftDocs/azure-docs/issues/23558)
-  - [PFX Import Support](https://github.com/MicrosoftDocs/azure-docs/issues/16543)
+This script creates device certificates for use.
+
+1. Creates an iot hub identity using a self signed certificate.
+
+1. Creates device certificates signed by the Intermediate CA
+
+1. Creates edge certificates signed by the Intermediate CA
+
+1. Creates leaf certificates signed by the Intermediate CA
+
+```bash
+# Usage         <type>  <name>
+./device-cert   self    self-signed-device
+./device-cert   device  my-device
+./device-cert   edge    my-edge
+./device-cert   leaf    my-leaf
+```
+
+### Current Issue List
 
 DPS Issues
   - Creating Enrollment Groups
@@ -82,7 +98,7 @@ DPS Issues
 DEVICE="cli-device-test"
 mkdir src/self
 
-# Create  a Device with x509 Self Signed by Hub
+# Create a Device with x509 Self Signed by Hub
 az iot hub device-identity create \
   --hub-name $HUB \
   --device-id $DEVICE \
@@ -90,7 +106,10 @@ az iot hub device-identity create \
   --output-dir src/self \
   --valid-days 10
 
-cat "./src/self/${DEVICE}-cert.pem" "./src/self/${DEVICE}-key.pem" > "./src/self/${DEVICE}.certwithkey.pem"
+# Store the Self Signed Certificate in KeyVault
+cat "./src/self/${DEVICE}-cert.pem" \
+  "./src/self/${DEVICE}-key.pem" \
+  > "./src/self/${DEVICE}.certwithkey.pem"
 
 az keyvault certificate import \
   --vault-name $VAULT \
@@ -101,51 +120,68 @@ az keyvault certificate import \
 ### Creating Intermediate CA Signed Device Certificates
 
 ```bash
-NAME="DirectDevice"
+DEVICE="DirectDevice"
 
-# Create a Device Certificates
-./src/generate.sh device $NAME
+# Create a Device Certificate signed by the Intermediate CA
+./src/generate.sh device $DEVICE
 
 # Create a Full Chain Certificate
-cat ./certs/$NAME.cert.pem ./certs/$ORGANIZATION.intermediate.cert.pem ./certs/$ORGANIZATION.root.ca.cert.pem > ./certs/$NAME-chain.cert.pem
+cat "./src/pki/certs/$DEVICE.cert.pem" \
+  "./src/pki/certs/$ORGANIZATION.intermediate.cert.pem" \
+  "./src/pki/certs/$ORGANIZATION.root.ca.cert.pem" \
+  > "./src/pki/certs/$DEVICE-chain.cert.pem"
 
 # Store the Edge Certificate in KeyVault
 az keyvault certificate import \
   --vault-name $VAULT \
-  --file "certs_pfx/${NAME}.cert.pfx" \
-  --name $NAME --password $PASSWORD
-
-az keyvault key import \
-  --vault-name $VAULT \
-  --pem-file "./private/${NAME}.key.pem" \
-  --name "${NAME}-key"
+  --name ${DEVICE} \
+  --file "./src/pki/certs_pfx/${DEVICE}.cert.pfx"
 ```
 
 ### Creating Intermediate CA Signed Edge Device Certificates
 
 ```bash
 # Create Edge Device Certificate
-NAME="edge-ubuntu"
-./src/generate.sh edge $NAME
+DEVICE="edge-ubuntu"
+./src/generate.sh edge $DEVICE
 
 # Create a Full Chain Certificate
-cat ./certs/$NAME.cert.pem ./certs/$ORGANIZATION.intermediate.cert.pem ./certs/$ORGANIZATION.root.ca.cert.pem > ./certs/$NAME-chain.cert.pem
+cat "./src/pki/certs/$DEVICE.cert.pem" \
+  "./src/pki/certs/$ORGANIZATION.intermediate.cert.pem" \
+  "./src/pki/certs/$ORGANIZATION.root.ca.cert.pem" \
+  > "./src/pki/certs/$DEVICE-chain.cert.pem"
 
 # Store the Edge Certificate in KeyVault
 az keyvault certificate import \
   --vault-name $VAULT \
-  --file "./certs_pfx/${NAME}.cert.pfx" \
-  --name $NAME \
-  --password $PASSWORD
+  --name ${DEVICE} \
+  --file "./src/pki/certs_pfx/${DEVICE}.cert.pfx"
 
-az keyvault key import \
-  --vault-name $VAULT \
-  --pem-file "./private/${NAME}.key.pem" \
-  --name "${NAME}-key"
 
 # Copy Edge Certificate to Edge Server
 EDGE_HOST="edge-ubuntu"
 scp ./certs/$ORGANIZATION.root.ca.cert.pem $EDGE_HOST:~/$ORGANIZATION.root.ca.cert.pem
 scp ./certs/$NAME.cert.pem $EDGE_HOST:~/$NAME-chain.cert.pem
 scp ./private/$NAME.key.pem $EDGE_HOST:~/$NAME.key.pem
+```
+
+### Creating Intermediate CA Signed Edge Device Certificates
+
+
+```bash
+# Create Edge Device Certificate
+DEVICE="leaf-device"
+./src/generate.sh leaf $DEVICE
+
+# Create a Full Chain Certificate
+cat "./src/pki/certs/$DEVICE.cert.pem" \
+  "./src/pki/certs/$ORGANIZATION.intermediate.cert.pem" \
+  "./src/pki/certs/$ORGANIZATION.root.ca.cert.pem" \
+  > "./src/pki/certs/$DEVICE-chain.cert.pem"
+
+# Store the Edge Certificate in KeyVault
+az keyvault certificate import \
+  --vault-name $VAULT \
+  --name ${DEVICE} \
+  --file "./src/pki/certs_pfx/${DEVICE}.cert.pfx"
 ```
