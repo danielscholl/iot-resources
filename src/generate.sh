@@ -288,14 +288,14 @@ function prepare_filesystem()
     rm -rf ${root_ca_dir}/private
     rm -rf ${root_ca_dir}/certs
     rm -rf ${root_ca_dir}/certs_pfx
-    # rm -rf ${root_ca_dir}/intermediateCerts
+    rm -rf ${root_ca_dir}/self
     rm -rf ${root_ca_dir}/newcerts
 
     mkdir -p ${root_ca_dir}/csr
     mkdir -p ${root_ca_dir}/private
     mkdir -p ${root_ca_dir}/certs
     mkdir -p ${root_ca_dir}/certs_pfx
-    # mkdir -p ${root_ca_dir}/intermediateCerts
+    mkdir -p ${root_ca_dir}/self
     mkdir -p ${root_ca_dir}/newcerts
 
     rm -f ${root_ca_dir}/index.txt
