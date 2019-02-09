@@ -9,6 +9,8 @@ Requires the use of [direnv](https://direnv.net/).
 
 Requires the use of [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
 
+Requires the use of [OpenSSL](https://www.openssl.org).
+
 
 ## Provision the Azure Resources
 
