@@ -46,7 +46,7 @@ export INT_CA_PASSWORD="<password>"
   - intermediate_ca.dnf
 
 
-## Creating and upload the Root CA and Intermediate Certificates
+## Create and Upload the Root CA and Intermediate Certificates
 
 This script initializes a Root and Intermediate CA for use.
 
@@ -63,7 +63,7 @@ This script initializes a Root and Intermediate CA for use.
 ./init-ca.sh
 ```
 
-## Creating and uploading Device Certificates
+## Creating and Storing Device Certificates
 
 This script creates device certificates for use.
 
