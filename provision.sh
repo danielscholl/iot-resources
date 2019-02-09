@@ -48,7 +48,8 @@ if [ -f ./params.json ]; then PARAMS="params.json"; else PARAMS="azuredeploy.par
 
 az deployment create --template-file azuredeploy.json  \
   --location $AZURE_LOCATION \
-  --parameters userObjectId=$USER_ID
+  --parameters userObjectId=$USER_ID \
+  -oyaml
 
 
 ##############################

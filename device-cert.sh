@@ -2,7 +2,7 @@
 #
 #  Purpose: Generate Device Certs and Store in Key Vault
 #  Usage:
-#    device-cert.sh
+#    device-cert.sh <type> <name>
 
 
 function create_chain()
@@ -11,10 +11,13 @@ function create_chain()
   tput setaf 2; echo "Creating Chain Certificate" ; tput sgr0
   tput setaf 3; echo "--------------------------" ; tput sgr0
 
+  # Concatinate the cert and pem to use as a chain
   cat "./src/pki/certs/$1.cert.pem" \
     "./src/pki/certs/$ORGANIZATION.intermediate.cert.pem" \
     "./src/pki/certs/$ORGANIZATION.root.ca.cert.pem" \
     > "./src/pki/certs/$1-chain.cert.pem"
+
+  echo "    ./src/pki/certs/$1-chain.cert.pem"
 }
 
 function save_vault()
@@ -23,10 +26,11 @@ function save_vault()
   tput setaf 2; echo "Saving to Vault" ; tput sgr0
   tput setaf 3; echo "---------------" ; tput sgr0
 
+  # Import Certificate to the Key Vault
   az keyvault certificate import \
     --vault-name $VAULT \
     --name ${1} \
-    --file "./src/pki/certs_pfx/${1}.cert.pfx"
+    --file "./src/pki/certs_pfx/${1}.cert.pfx" -oyaml
 }
 
 function generate_device_certificate()
@@ -71,12 +75,14 @@ function generate_self_certificate()
   tput setaf 2; echo "Creating Device Identity" ; tput sgr0
   tput setaf 3; echo "------------------------" ; tput sgr0
 
+  # Create a Device Identity with a Self Signed x509
   az iot hub device-identity create \
     --hub-name $HUB \
     --device-id $1 \
     --auth-method x509_thumbprint \
     --output-dir "./src/pki/self" \
-    --valid-days 10
+    --valid-days 10 \
+    -oyaml
 
   cat "./src/pki/self/${1}-cert.pem" \
     "./src/pki/self/${1}-key.pem" \
@@ -85,7 +91,10 @@ function generate_self_certificate()
   az keyvault certificate import \
     --vault-name $VAULT \
     --name ${1} \
-    --file "./src/pki/self/${1}.certwithkey.pem"
+    --file "./src/pki/self/${1}.certwithkey.pem" \
+    -oyaml
+
+  echo "    ./src/pki/self/${1}.certwithkey.pem"
 }
 
 

@@ -37,42 +37,46 @@ az keyvault secret set \
   --vault-name $VAULT \
   --name "$ORGANIZATION-ROOT-CA-PASSWORD" \
   --value $ROOT_CA_PASSWORD \
-  -ojson
+  -oyaml
 
 # Store the Intermediate CA Key Password in the Vault
 az keyvault secret set \
   --vault-name $VAULT \
   --name "$ORGANIZATION-INT-CA-PASSWORD" \
   --value $INT_CA_PASSWORD \
-  -ojson
+  -oyaml
 
 # Store the Root CA Private Key in the Vault
 az keyvault key import \
   --vault-name $VAULT \
   --name "${ORGANIZATION}-root-ca-key" \
   --pem-password $ROOT_CA_PASSWORD \
-  --pem-file "./src/pki/private/${ORGANIZATION}.root.ca.key.pem"
+  --pem-file "./src/pki/private/${ORGANIZATION}.root.ca.key.pem" \
+  -oyaml
 
 # Store the Intermediate CA Private Key in the Vault
 az keyvault key import \
   --vault-name $VAULT \
   --name "${ORGANIZATION}-intermediate-key" \
   --pem-password $INT_CA_PASSWORD \
-  --pem-file "./src/pki/private/${ORGANIZATION}.intermediate.key.pem"
+  --pem-file "./src/pki/private/${ORGANIZATION}.intermediate.key.pem" \
+  -oyaml
 
 # Store the Root CA Certificate in the Vault
 az keyvault certificate import \
   --vault-name $VAULT \
   --name "${ORGANIZATION}-root-ca" \
   --password $ROOT_CA_PASSWORD \
-  --file "./src/pki/certs_pfx/${ORGANIZATION}.root.ca.cert.pfx"
+  --file "./src/pki/certs_pfx/${ORGANIZATION}.root.ca.cert.pfx" \
+  -oyaml
 
 # Store the Intermediate CA Certificate in the Vault
 az keyvault certificate import \
   --vault-name $VAULT \
   --name "${ORGANIZATION}-intermediate-ca" \
   --password $INT_CA_PASSWORD \
-  --file "./src/pki/certs_pfx/${ORGANIZATION}.intermediate.cert.pfx"
+  --file "./src/pki/certs_pfx/${ORGANIZATION}.intermediate.cert.pfx" \
+  -oyaml
 
 ###############################
 ## Upload Root CA to IoT Hub ##
@@ -85,7 +89,8 @@ tput setaf 3; echo "---------------------------------------" ; tput sgr0
 az iot hub certificate create \
   --name "${ORGANIZATION}-ca" \
   --hub-name $HUB \
-  --path src/pki/certs/${ORGANIZATION}.root.ca.cert.pem -ojson
+  --path src/pki/certs/${ORGANIZATION}.root.ca.cert.pem \
+  -oyaml
 
 # Retrieve the Certificate ETAG
 ETAG=$(az iot hub certificate show \
@@ -114,7 +119,8 @@ az iot hub certificate verify \
   --name "${ORGANIZATION}-ca" \
   --hub-name $HUB \
   --etag $ETAG \
-  --path src/pki/certs/${ORGANIZATION}-verify.cert.pem -ojson
+  --path src/pki/certs/${ORGANIZATION}-verify.cert.pem \
+  -oyaml
 
 
 #######################################
@@ -128,7 +134,8 @@ tput setaf 3; echo "-----------------------------------------------" ; tput sgr0
 az iot hub certificate create \
   --name "${ORGANIZATION}-intermediate" \
   --hub-name $HUB \
-  --path src/pki/certs/${ORGANIZATION}.intermediate.cert.pem -ojson
+  --path src/pki/certs/${ORGANIZATION}.intermediate.cert.pem \
+  -oyaml
 
 # Retrieve the Certificate ETAG
 ETAG=$(az iot hub certificate show \
@@ -157,7 +164,8 @@ az iot hub certificate verify \
   --name "${ORGANIZATION}-intermediate" \
   --hub-name $HUB \
   --etag $ETAG \
-  --path src/pki/certs/${ORGANIZATION}-verify.cert.pem -ojson
+  --path src/pki/certs/${ORGANIZATION}-verify.cert.pem \
+  -oyaml
 
 ##############################
 ## Upload Root CA to DPS    ##
@@ -171,7 +179,8 @@ az iot dps certificate create \
   --name "${ORGANIZATION}-ca" \
   --resource-group $DPS_GROUP \
   --dps-name $DPS \
-  --path src/pki/certs/${ORGANIZATION}.root.ca.cert.pem -ojson
+  --path src/pki/certs/${ORGANIZATION}.root.ca.cert.pem \
+  -oyaml
 
 # Retrieve the Certificate ETAG
 ETAG=$(az iot dps certificate show \
@@ -204,7 +213,8 @@ az iot dps certificate verify \
   --dps-name $DPS \
   --resource-group $DPS_GROUP \
   --etag $ETAG \
-  --path src/pki/certs/${ORGANIZATION}-verify.cert.pem -ojson
+  --path src/pki/certs/${ORGANIZATION}-verify.cert.pem \
+  -oyaml
 
 
 ####################################
@@ -219,7 +229,8 @@ az iot dps certificate create \
   --name "${ORGANIZATION}-intermediate" \
   --resource-group $DPS_GROUP \
   --dps-name $DPS \
-  --path src/pki/certs/${ORGANIZATION}.intermediate.cert.pem -ojson
+  --path src/pki/certs/${ORGANIZATION}.intermediate.cert.pem \
+  -oyaml
 
 # Retrieve the Certificate ETAG
 ETAG=$(az iot dps certificate show \
@@ -252,7 +263,8 @@ az iot dps certificate verify \
   --dps-name $DPS \
   --resource-group $DPS_GROUP \
   --etag $ETAG \
-  --path src/pki/certs/${ORGANIZATION}-verify.cert.pem -ojson
+  --path src/pki/certs/${ORGANIZATION}-verify.cert.pem \
+  -oyaml
 
 validate_cleanup
 
@@ -264,7 +276,7 @@ printf "\n"
 tput setaf 2; echo "Create Enrollment Group for Root & Intermediate CA" ; tput sgr0
 tput setaf 3; echo "--------------------------------------------------" ; tput sgr0
 
-tput setaf 5; echo "** DPS cli enrollment-group bugs prevent creating enrollement group **" ; tput sgr0
+tput setaf 5; echo "** TODO:// DPS cli enrollment-group create enrollement group **" ; tput sgr0
 ##  BUGS DON"T ALLOW THIS YET   ##
 # # Register the Enrollement Group
 # az iot dps enrollment-group create \
