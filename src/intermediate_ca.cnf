@@ -77,9 +77,9 @@ emailAddress                    = Email Address
 countryName_default             = US
 stateOrProvinceName_default     = TX
 localityName_default            =
-0.organizationName_default      = danielscholl.info
+0.organizationName_default      = IoT Testing Intermediate CA
 organizationalUnitName_default  =
-emailAddress_default            =
+emailAddress_default            = admin@iottesting
 
 [ v3_ca ]
 # Extensions for a typical CA.

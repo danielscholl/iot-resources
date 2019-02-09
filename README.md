@@ -80,9 +80,9 @@ DPS Issues
 
 ```bash
 DEVICE="cli-device-test"
+mkdir src/self
 
 # Create  a Device with x509 Self Signed by Hub
-mkdir src/self
 az iot hub device-identity create \
   --hub-name $HUB \
   --device-id $DEVICE \

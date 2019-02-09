@@ -60,21 +60,19 @@ az keyvault key import \
   --pem-password $INT_CA_PASSWORD \
   --pem-file "./src/pki/private/${ORGANIZATION}.intermediate.key.pem"
 
-tput setaf 5; echo "** KeyVault cli certificate import bugs prevent uploading certs to KV **" ; tput sgr0
-##  BUGS DON"T ALLOW THIS YET   ##
 # Store the Root CA Certificate in the Vault
-# az keyvault certificate import \
-#   --vault-name $VAULT \
-#   --name "${ORGANIZATION}-root" \
-#   --file "./src/pki/certs_pfx/${ORGANIZATION}.root.ca.pfx"
+az keyvault certificate import \
+  --vault-name $VAULT \
+  --name "${ORGANIZATION}-root-ca" \
+  --password $ROOT_CA_PASSWORD \
+  --file "./src/pki/certs_pfx/${ORGANIZATION}.root.ca.cert.pfx"
 
 # Store the Intermediate CA Certificate in the Vault
-# az keyvault certificate import \
-#   --vault-name $VAULT \
-#   --name "${ORGANIZATION}-root" \
-#   --file "./src/pki/certs_pfx/${ORGANIZATION}.intermediate.pfx"
-
-
+az keyvault certificate import \
+  --vault-name $VAULT \
+  --name "${ORGANIZATION}-intermediate-ca" \
+  --password $INT_CA_PASSWORD \
+  --file "./src/pki/certs_pfx/${ORGANIZATION}.intermediate.pfx"
 
 
 ###############################
@@ -119,9 +117,6 @@ az iot hub certificate verify \
   --etag $ETAG \
   --path src/pki/certs/${ORGANIZATION}-verify.cert.pem -ojson
 
-# Cleanup Here as generate.sh isn't doing this properly yet.  (Timing?)
-# validate_cleanup
-
 
 #######################################
 ## Upload Intermediate CA to IoT Hub ##
@@ -164,11 +159,6 @@ az iot hub certificate verify \
   --hub-name $HUB \
   --etag $ETAG \
   --path src/pki/certs/${ORGANIZATION}-verify.cert.pem -ojson
-
-
-# Cleanup Here as generate.sh isn't doing this properly yet.  (Timing?)
-# validate_cleanup
-
 
 ##############################
 ## Upload Root CA to DPS    ##
@@ -216,9 +206,6 @@ az iot dps certificate verify \
   --resource-group $DPS_GROUP \
   --etag $ETAG \
   --path src/pki/certs/${ORGANIZATION}-verify.cert.pem -ojson
-
-# Cleanup Here as generate.sh isn't doing this properly yet.  (Timing?)
-# validate_cleanup
 
 
 ####################################
@@ -268,8 +255,7 @@ az iot dps certificate verify \
   --etag $ETAG \
   --path src/pki/certs/${ORGANIZATION}-verify.cert.pem -ojson
 
-# Cleanup Here as generate.sh isn't doing this properly yet.  (Timing?)
-# validate_cleanup
+validate_cleanup
 
 
 ##############################

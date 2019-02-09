@@ -33,7 +33,7 @@ intermediate_ca_password=$INT_CA_PASSWORD               ### SET FROM ENVRC
 
 function generate_root_ca()
 {
-    local common_name="${ORGANIZATION} Root CA Cert"
+    local common_name="Root CA Cert - ${ORGANIZATION}"
     local password_cmd=" -aes256 -passout pass:${root_ca_password} "
 
     openssl ${algorithm} \
@@ -93,7 +93,7 @@ function generate_root_ca()
 ###############################################################################
 function generate_intermediate_ca()
 {
-    local common_name="${ORGANIZATION} Intermediate CA Cert"
+    local common_name="Intermediate CA Cert - ${ORGANIZATION}"
     local password_cmd=" -aes256 -passout pass:${intermediate_ca_password} "
 
     printf "\n"
@@ -160,16 +160,17 @@ function generate_intermediate_ca()
     [ $? -eq 0 ] || exit $?
 
 
-    ## BUG IN THIS STEP STILL
-    # printf "\n"
-    # tput setaf 2; echo "Create the Intermediate PFX Certificate" ; tput sgr0
-    # tput setaf 3; echo "---------------------------------------" ; tput sgr0
-    # openssl pkcs12 -in ${intermediate_ca_dir}/certs/${intermediate_ca_prefix}.cert.pem \
-    #         -inkey ${intermediate_ca_dir}/private/${intermediate_ca_prefix}.key.pem \
-    #         ${password_cmd}  \
-    #         ${export_password_cmd}  \
-    #         -export -out ${intermediate_ca_dir}/certs_pfx/${intermediate_ca_prefix}.cert.pfx
-    # [ $? -eq 0 ] || exit $?
+    printf "\n"
+    tput setaf 2; echo "Create the Intermediate PFX Certificate" ; tput sgr0
+    tput setaf 3; echo "---------------------------------------" ; tput sgr0
+    password_cmd=" -passin pass:${intermediate_ca_password} "
+    export_password_cmd=" -passout pass:${intermediate_ca_password} "
+    openssl pkcs12 -in ${intermediate_ca_dir}/certs/${intermediate_ca_prefix}.cert.pem \
+            -inkey ${intermediate_ca_dir}/private/${intermediate_ca_prefix}.key.pem \
+            ${password_cmd}  \
+            ${export_password_cmd}  \
+            -export -out ${intermediate_ca_dir}/certs_pfx/${intermediate_ca_prefix}.cert.pfx
+    [ $? -eq 0 ] || exit $?
 
 
     printf "\n"
