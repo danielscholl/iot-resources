@@ -78,11 +78,11 @@ This script creates device certificates for use.
 1. Creates leaf certificates signed by the Intermediate CA
 
 ```bash
-# Usage         <type>  <name>
-./device-cert   self    self-signed-device
-./device-cert   device  my-device
-./device-cert   edge    my-edge
-./device-cert   leaf    my-leaf
+# Usage            <type>  <name>
+./device-cert.sh   self    self-signed-device
+./device-cert.sh   device  my-device
+./device-cert.sh   edge    my-edge
+./device-cert.sh   leaf    my-leaf
 ```
 
 ### Current ToDo List
