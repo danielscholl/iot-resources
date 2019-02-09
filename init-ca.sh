@@ -72,8 +72,7 @@ az keyvault certificate import \
   --vault-name $VAULT \
   --name "${ORGANIZATION}-intermediate-ca" \
   --password $INT_CA_PASSWORD \
-  --file "./src/pki/certs_pfx/${ORGANIZATION}.intermediate.pfx"
-
+  --file "./src/pki/certs_pfx/${ORGANIZATION}.intermediate.cert.pfx"
 
 ###############################
 ## Upload Root CA to IoT Hub ##
