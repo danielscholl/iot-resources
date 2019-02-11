@@ -277,10 +277,9 @@ tput setaf 2; echo "Create Enrollment Group for Root & Intermediate CA" ; tput s
 tput setaf 3; echo "--------------------------------------------------" ; tput sgr0
 
 tput setaf 5; echo "** TODO:// DPS cli enrollment-group create enrollement group **" ; tput sgr0
-##  BUGS DON"T ALLOW THIS YET   ##
 # # Register the Enrollement Group
-# az iot dps enrollment-group create \
-#   --dps-name $DPS \
-#   --resource-group $DPS_GROUP \
-#   --enrollment-id "${ORGANIZATION}" \
-#   --root-ca-name "${ORGANIZATION}-ca"
+az iot dps enrollment-group create \
+  --enrollment-id '${ORGANIZATION}' \
+  --resource-group $DPS_GROUP \
+  --dps-name $DPS \
+  --ca-name '${ORGANIZATION}-ca' -oyaml

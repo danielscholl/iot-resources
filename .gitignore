@@ -1,3 +1,4 @@
 src/pki
 src/self
+aci/*.yaml
 .envrc

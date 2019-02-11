@@ -5,6 +5,54 @@
 #    device-cert.sh <type> <name>
 
 
+function aci_deploy() {
+  if [ $# -ne 1 ]; then
+    echo "Usage: <subjectName>"
+    exit 1
+  fi
+
+  printf "\n"
+  tput setaf 2; echo "Creating ACI Deployment" ; tput sgr0
+  tput setaf 3; echo "-----------------------" ; tput sgr0
+
+  b64_cert=$(openssl base64 -in ./src/pki/self/${1}-cert.pem |tr -d '\n')
+  b64_key=$(openssl base64 -in ./src/pki/self/${1}-key.pem |tr -d '\n')
+
+  cat > ./aci/deploy-${1}.yaml << EOF
+apiVersion: '2018-06-01'
+location: eastus
+name: $1
+properties:
+  containers:
+  - name: $1
+    properties:
+      environmentVariables:
+        - name: 'DEVICE'
+          value: '${1}'
+        - name: 'DEVICE_CONNECTION_STRING'
+          secureValue: 'HostName=$HUB.azure-devices.net;DeviceId=$1;x509=true'
+      image: danielscholl/iot-device-js:latest
+      ports: []
+      resources:
+        requests:
+          cpu: 1.0
+          memoryInGB: 1.5
+      volumeMounts:
+      - mountPath: /usr/src/app/cert
+        name: certvolume
+  osType: Linux
+  restartPolicy: Always
+  volumes:
+  - name: certvolume
+    secret:
+      device-cert.pem: ${b64_cert}
+      device-key.pem: ${b64_key}
+tags: {}
+type: Microsoft.ContainerInstance/containerGroups
+EOF
+  echo "    ./aci/deploy-${1}.yaml"
+}
+
 function create_chain()
 {
   printf "\n"
@@ -78,6 +126,11 @@ function generate_leaf_certificate()
 
 function generate_self_certificate()
 {
+  if [ $# -ne 1 ]; then
+    echo "Usage: <subjectName>"
+    exit 1
+  fi
+
   printf "\n"
   tput setaf 2; echo "Creating Device Identity" ; tput sgr0
   tput setaf 3; echo "------------------------" ; tput sgr0
@@ -88,7 +141,6 @@ function generate_self_certificate()
     --device-id $1 \
     --auth-method x509_thumbprint \
     --output-dir "./src/pki/self" \
-    --valid-days 10 \
     -oyaml
 
   cat "./src/pki/self/${1}-cert.pem" \
@@ -102,17 +154,19 @@ function generate_self_certificate()
     -oyaml
 
   echo "    ./src/pki/self/${1}.certwithkey.pem"
+
+  aci_deploy ${1}
 }
 
 
-if [ "${1}" == "device" ]; then
-    generate_device_certificate "${2}"
-elif [ "${1}" == "edge" ]; then
-    generate_edge_certificate "${2}"
-elif [ "${1}" == "leaf" ]; then
-    generate_leaf_certificate "${2}"
-elif [ "${1}" == "self" ]; then
-    generate_self_certificate "${2}"
+if [ ${1} == "device" ]; then
+    generate_device_certificate ${2}
+elif [ ${1} == "edge" ]; then
+    generate_edge_certificate ${2}
+elif [ ${1} == "leaf" ]; then
+    generate_leaf_certificate ${2}
+elif [ ${1} == "self" ]; then
+    generate_self_certificate ${2}
 else
     echo "Usage: device <deviceName>  # Creates a new device certificate"
     echo "       edge   <deviceName>  # Creates a new edge device certificate"
