@@ -279,7 +279,7 @@ tput setaf 3; echo "--------------------------------------------------" ; tput s
 tput setaf 5; echo "** TODO:// DPS cli enrollment-group create enrollement group **" ; tput sgr0
 # # Register the Enrollement Group
 az iot dps enrollment-group create \
-  --enrollment-id '${ORGANIZATION}' \
+  --enrollment-id ${ORGANIZATION} \
   --resource-group $DPS_GROUP \
   --dps-name $DPS \
   --ca-name '${ORGANIZATION}-ca' -oyaml
