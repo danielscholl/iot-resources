@@ -45,7 +45,7 @@
     },
     "customData": {
       "type": "string",
-      "defaultValue": "echo customData",
+      "defaultValue": "ZWNobyAnSGVsbG8gV29ybGQn",
       "metadata": {
         "description": "String passed down to the Virtual Machine."
       }

@@ -56,6 +56,9 @@ cat > azuredeploy.parameters.json << EOF2
     },
     "sshKeyData": {
       "value": "$(< ~/.ssh/id_rsa.pub)"
+    },
+    "customData": {
+      "value": "$(openssl base64 -in ./cloud-init.txt |tr -d '\n')"
     }
   }
 }
@@ -67,6 +70,7 @@ az deployment create --template-file azuredeploy.json  \
   --parameters userObjectId=$USER_ID group=$AZURE_GROUP \
   -oyaml
 
+rm azuredeploy.parameters.json
 
 ##############################
 ## Deploy .envrc File       ##
