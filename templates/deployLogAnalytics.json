@@ -28,7 +28,7 @@
   },
   "variables": {
     "omsWorkspaceName": "[concat('log', uniqueString(resourceGroup().id))]",
-    "omsWorkspaceId": "[resourceId('Microsoft.KeyVault/vaults', variables('omsWorkspaceName'))]"
+    "omsWorkspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('omsWorkspaceName'))]"
   },
   "resources": [
     {
