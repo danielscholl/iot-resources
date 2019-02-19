@@ -61,12 +61,30 @@
       }
     },
     {
-      "name": "TemplateIotResources",
+      "name": "TemplateLogAnalytics",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
       "resourceGroup": "[parameters('group')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/resourceGroups/', parameters('group'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('templateURL'), 'deployLogAnalytics.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {}
+      }
+    },
+    {
+      "name": "TemplateIotResources",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "resourceGroup": "[parameters('group')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/resourceGroups/', parameters('group'))]",
+        "TemplateLogAnalytics"
       ],
       "properties": {
         "mode": "Incremental",

@@ -18,7 +18,7 @@ if [ -z $AZURE_LOCATION ]; then
 fi
 
 if [ -z $AZURE_GROUP ]; then
-  AZURE_GROUP="iot-x509-testing"
+  AZURE_GROUP="iot-testing"
 fi
 
 if [ -z $ORGANIZATION ]; then
@@ -48,7 +48,7 @@ if [ -f ./params.json ]; then PARAMS="params.json"; else PARAMS="azuredeploy.par
 
 az deployment create --template-file azuredeploy.json  \
   --location $AZURE_LOCATION \
-  --parameters userObjectId=$USER_ID \
+  --parameters userObjectId=$USER_ID group=$AZURE_GROUP \
   -oyaml
 
 
