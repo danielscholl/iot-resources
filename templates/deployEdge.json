@@ -61,7 +61,7 @@
   "variables": {
     "VNetName": "[concat(parameters('prefix'), '-vnet')]",
     "VNetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('VNetName'))]",
-    "SubnetName": "front_subnet",
+    "SubnetName": "edge_subnet",
     "SubNetId": "[concat(variables('VNetId'), '/subnets/', variables('SubnetName'))]",
     "NsgName": "[concat(variables('SubnetName'), '-nsg')]",
     "cleanPrefix": "[toLower(parameters('prefix'))]",
@@ -135,8 +135,7 @@
         "Company": "[parameters('prefix')]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses', variables('PublicIpName'))]",
-        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NsgName'))]"
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('PublicIpName'))]"
       ],
       "properties": {
         "ipConfigurations": [

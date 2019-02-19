@@ -51,9 +51,6 @@ cat > azuredeploy.parameters.json << EOF2
   "\$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "userObjectId": {
-      "value": "$USER_ID"
-    },
     "adminUserName": {
       "value": "$(whoami)"
     },
@@ -67,6 +64,7 @@ EOF2
 az deployment create --template-file azuredeploy.json  \
   --location $AZURE_LOCATION \
   --parameters azuredeploy.parameters.json \
+  --parameters userObjectId=$USER_ID group=$AZURE_GROUP \
   -oyaml
 
 
