@@ -64,10 +64,13 @@
     "SubnetName": "edge_subnet",
     "SubNetId": "[concat(variables('VNetId'), '/subnets/', variables('SubnetName'))]",
     "NsgName": "[concat(variables('SubnetName'), '-nsg')]",
+    "NsgId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]",
     "cleanPrefix": "[toLower(parameters('prefix'))]",
     "vmName": "[concat(variables('cleanPrefix'), '-vm')]",
     "PublicIpName": "[concat(variables('vmName'), '-ip')]",
+    "PublicIpId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('PublicIpName'))]",
     "NicName": "[concat(variables('vmName'),'-nic')]",
+    "NicId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]",
     "sshKeyPath": "[concat('/home/',parameters('adminUserName'),'/.ssh/authorized_keys')]"
   },
   "resources": [
@@ -91,7 +94,7 @@
       "apiVersion": "2016-03-30",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
+        "[variables('NsgId')]"
       ],
       "tags": {
         "displayName": "Virtual Network"
@@ -135,7 +138,8 @@
         "Company": "[parameters('prefix')]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses', variables('PublicIpName'))]"
+        "[variables('PublicIpId')]",
+        "[variables('VNetId')]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -160,6 +164,10 @@
       "name": "[concat(parameters('prefix'), '-', variables('vmName'), '-vm')]",
       "apiVersion": "2016-04-30-preview",
       "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[variables('VNetId')]",
+        "[variables('NicId')]"
+      ],
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('vmSize')]"
@@ -193,7 +201,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('NicName'))]"
+              "id": "[variables('NicId')]"
             }
           ]
         }
