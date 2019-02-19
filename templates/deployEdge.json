@@ -64,13 +64,13 @@
     "SubnetName": "edge_subnet",
     "SubNetId": "[concat(variables('VNetId'), '/subnets/', variables('SubnetName'))]",
     "NsgName": "[concat(variables('SubnetName'), '-nsg')]",
-    "NsgId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]",
+    "NsgId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NsgName'))]",
     "cleanPrefix": "[toLower(parameters('prefix'))]",
     "vmName": "[concat(variables('cleanPrefix'), '-vm')]",
     "PublicIpName": "[concat(variables('vmName'), '-ip')]",
     "PublicIpId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('PublicIpName'))]",
     "NicName": "[concat(variables('vmName'),'-nic')]",
-    "NicId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]",
+    "NicId": "[resourceId('Microsoft.Network/networkInterfaces', variables('NicName'))]",
     "sshKeyPath": "[concat('/home/',parameters('adminUserName'),'/.ssh/authorized_keys')]"
   },
   "resources": [
