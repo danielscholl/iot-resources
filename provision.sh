@@ -46,9 +46,27 @@ tput setaf 2; echo "Deploying the ARM Templates" ; tput sgr0
 tput setaf 3; echo "------------------------------------" ; tput sgr0
 if [ -f ./params.json ]; then PARAMS="params.json"; else PARAMS="azuredeploy.parameters.json"; fi
 
+cat > azuredeploy.parameters.json << EOF2
+{
+  "\$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "userObjectId": {
+      "value": "$USER_ID"
+    },
+    "adminUserName": {
+      "value": "$(whoami)"
+    },
+    "sshKeyData": {
+      "value": "$(< ~/.ssh/id_rsa.pub)"
+    }
+  }
+}
+EOF2
+
 az deployment create --template-file azuredeploy.json  \
   --location $AZURE_LOCATION \
-  --parameters userObjectId=$USER_ID group=$AZURE_GROUP \
+  --parameters azuredeploy.parameters.json \
   -oyaml
 
 

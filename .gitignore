@@ -2,3 +2,4 @@ src/pki
 src/self
 aci/*.yaml
 .envrc
+azuredeploy.parameters.json
