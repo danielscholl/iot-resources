@@ -14,14 +14,14 @@
       "metadata": {
         "description": "Solution Name"
       },
-      "defaultValue": "iot-x509-testing"
+      "defaultValue": "iot-resources"
     },
     "templateURL": {
       "type": "string",
       "metadata": {
         "description": "URL Location on where to find the templates"
       },
-      "defaultValue": "https://raw.githubusercontent.com/danielscholl/iot-x509-testing/master/templates/"
+      "defaultValue": "https://raw.githubusercontent.com/danielscholl/iot-resources/master/templates/"
     },
     "userObjectId": {
       "type": "string",
