@@ -168,7 +168,7 @@
     {
       "comments": "## Virtual Machine ##",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[concat(parameters('prefix'), '-', variables('vmName'))]",
+      "name": "[concat(variables('vmName'))]",
       "apiVersion": "2016-04-30-preview",
       "location": "[resourceGroup().location]",
       "dependsOn": [

@@ -28,27 +28,6 @@
       "metadata": {
         "description": "ObjectId of current logged in user."
       }
-    },
-    "adminUserName": {
-      "type": "string",
-      "metadata": {
-        "description": "Linux servers admin user account name."
-      },
-      "defaultValue": "azureuser",
-      "minLength": 1
-    },
-    "sshKeyData": {
-      "type": "string",
-      "metadata": {
-        "description": "SSH rsa public key file as a string."
-      }
-    },
-    "customData": {
-      "type": "string",
-      "defaultValue": "ZWNobyAnSGVsbG8gV29ybGQn",
-      "metadata": {
-        "description": "String passed down to the Virtual Machine."
-      }
     }
   },
   "variables": {},
@@ -114,33 +93,6 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {}
-      }
-    },
-    {
-      "name": "TemplateEdge",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "resourceGroup": "[parameters('group')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Resources/resourceGroups/', parameters('group'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('templateURL'), 'deployEdge.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "adminUserName": {
-            "value": "[parameters('adminUserName')]"
-          },
-          "sshKeyData": {
-            "value": "[parameters('sshKeyData')]"
-          },
-          "customData": {
-            "value": "[parameters('customData')]"
-          }
-        }
       }
     }
   ],

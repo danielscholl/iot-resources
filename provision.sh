@@ -18,7 +18,7 @@ if [ -z $AZURE_LOCATION ]; then
 fi
 
 if [ -z $AZURE_GROUP ]; then
-  AZURE_GROUP="iot-testing"
+  AZURE_GROUP="iot-resources"
 fi
 
 if [ -z $ORGANIZATION ]; then
@@ -46,31 +46,10 @@ tput setaf 2; echo "Deploying the ARM Templates" ; tput sgr0
 tput setaf 3; echo "------------------------------------" ; tput sgr0
 if [ -f ./params.json ]; then PARAMS="params.json"; else PARAMS="azuredeploy.parameters.json"; fi
 
-cat > azuredeploy.parameters.json << EOF2
-{
-  "\$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "adminUserName": {
-      "value": "$(whoami)"
-    },
-    "sshKeyData": {
-      "value": "$(< ~/.ssh/id_rsa.pub)"
-    },
-    "customData": {
-      "value": "$(openssl base64 -in ./cloud-init.txt |tr -d '\n')"
-    }
-  }
-}
-EOF2
-
 az deployment create --template-file azuredeploy.json  \
   --location $AZURE_LOCATION \
-  --parameters azuredeploy.parameters.json \
   --parameters userObjectId=$USER_ID group=$AZURE_GROUP \
   -oyaml
-
-rm azuredeploy.parameters.json
 
 ##############################
 ## Deploy .envrc File       ##

@@ -1,4 +1,4 @@
-# iot-x509-testing
+# iot-x509
 
 The purpose of this solution is to be able to test x509 certificates using x509 certs signed by an Intermediate CA.  It uses the base script provided in the azure-iot-sdk but heavily modified which is a solution _not recommended_ to be used in a production scenario and used for testing purposes only.
 
