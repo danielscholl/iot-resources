@@ -98,6 +98,3 @@ This script creates device certificates for use.
 az container create --resource-group ${GROUP} --file aci/deploy-$DEVICE.yaml -oyaml
 az container delete --resource-group ${GROUP} --name $DEVICE --yes -oyaml
 ```
-### Current ToDo List
-
-- Creating Enrollment Groups
