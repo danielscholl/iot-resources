@@ -11,6 +11,12 @@ Requires the use of [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/insta
 
 Requires the use of [OpenSSL](https://www.openssl.org).
 
+### Related Repositories
+
+- [iot-resources](https://github.com/danielscholl/iot-resources)  - Deploying IoT Resources and x509 Management
+- [iot-device-edge](https://github.com/danielscholl/iot-device-edge) - Simple Edge Testing
+- [iot-device-js](https://github.com/danielscholl/iot-device-js) - Simple Device Testing
+- [iot-control-js](https://github.com/danielscholl/iot-control-js) - Simple Control Testing
 
 ## Provision the Azure Resources
 
