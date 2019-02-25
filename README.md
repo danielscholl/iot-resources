@@ -90,11 +90,3 @@ This script creates device certificates for use.
 ./device-cert.sh   edge    my-edge
 ./device-cert.sh   leaf    my-leaf
 ```
-
-
-## Deploying to ACI
-
-```bash
-az container create --resource-group ${GROUP} --file aci/deploy-$DEVICE.yaml -oyaml
-az container delete --resource-group ${GROUP} --name $DEVICE --yes -oyaml
-```

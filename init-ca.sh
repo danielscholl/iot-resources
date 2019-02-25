@@ -81,46 +81,46 @@ az keyvault certificate import \
 ###############################
 ## Upload Root CA to IoT Hub ##
 ###############################
-printf "\n"
-tput setaf 2; echo "Uploding Root CA Certificate to IoT Hub" ; tput sgr0
-tput setaf 3; echo "---------------------------------------" ; tput sgr0
+# printf "\n"
+# tput setaf 2; echo "Uploding Root CA Certificate to IoT Hub" ; tput sgr0
+# tput setaf 3; echo "---------------------------------------" ; tput sgr0
 
-# Upload the Certificates to IoT Hub
-az iot hub certificate create \
-  --name "${ORGANIZATION}-ca" \
-  --hub-name $HUB \
-  --path src/pki/certs/${ORGANIZATION}.root.ca.cert.pem \
-  -oyaml
+# # Upload the Certificates to IoT Hub
+# az iot hub certificate create \
+#   --name "${ORGANIZATION}-ca" \
+#   --hub-name $HUB \
+#   --path src/pki/certs/${ORGANIZATION}.root.ca.cert.pem \
+#   -oyaml
 
-# Retrieve the Certificate ETAG
-ETAG=$(az iot hub certificate show \
-        --name "${ORGANIZATION}-ca" \
-        --hub-name $HUB \
-        --query etag -otsv)
+# # Retrieve the Certificate ETAG
+# ETAG=$(az iot hub certificate show \
+#         --name "${ORGANIZATION}-ca" \
+#         --hub-name $HUB \
+#         --query etag -otsv)
 
-# Generate a Verification Code for the Certificate
-CODE=$(az iot hub certificate generate-verification-code \
-                --name "${ORGANIZATION}-ca" \
-                --hub-name $HUB \
-                --etag $ETAG \
-                --query properties.verificationCode -otsv)
+# # Generate a Verification Code for the Certificate
+# CODE=$(az iot hub certificate generate-verification-code \
+#                 --name "${ORGANIZATION}-ca" \
+#                 --hub-name $HUB \
+#                 --etag $ETAG \
+#                 --query properties.verificationCode -otsv)
 
-# Generate a Verification Certificate signed by the Root CA to prove CA ownership
-./src/generate.sh verify $CODE
+# # Generate a Verification Certificate signed by the Root CA to prove CA ownership
+# ./src/generate.sh verify $CODE
 
-# Retrieve the Certificate ETAG which changed when the Verification Code was generated
-ETAG=$(az iot hub certificate show \
-        --name "${ORGANIZATION}-ca" \
-        --hub-name $HUB \
-        --query etag -otsv)
+# # Retrieve the Certificate ETAG which changed when the Verification Code was generated
+# ETAG=$(az iot hub certificate show \
+#         --name "${ORGANIZATION}-ca" \
+#         --hub-name $HUB \
+#         --query etag -otsv)
 
-# Verify the CA Certificate with the Validation Certificate
-az iot hub certificate verify \
-  --name "${ORGANIZATION}-ca" \
-  --hub-name $HUB \
-  --etag $ETAG \
-  --path src/pki/certs/${ORGANIZATION}-verify.cert.pem \
-  -oyaml
+# # Verify the CA Certificate with the Validation Certificate
+# az iot hub certificate verify \
+#   --name "${ORGANIZATION}-ca" \
+#   --hub-name $HUB \
+#   --etag $ETAG \
+#   --path src/pki/certs/${ORGANIZATION}-verify.cert.pem \
+#   -oyaml
 
 
 #######################################
@@ -170,51 +170,51 @@ az iot hub certificate verify \
 ##############################
 ## Upload Root CA to DPS    ##
 ##############################
-printf "\n"
-tput setaf 2; echo "Uploding Root CA Certificate to DPS" ; tput sgr0
-tput setaf 3; echo "-----------------------------------" ; tput sgr0
+# printf "\n"
+# tput setaf 2; echo "Uploding Root CA Certificate to DPS" ; tput sgr0
+# tput setaf 3; echo "-----------------------------------" ; tput sgr0
 
-# Upload the Certificates to DPS
-az iot dps certificate create \
-  --name "${ORGANIZATION}-ca" \
-  --resource-group $DPS_GROUP \
-  --dps-name $DPS \
-  --path src/pki/certs/${ORGANIZATION}.root.ca.cert.pem \
-  -oyaml
+# # Upload the Certificates to DPS
+# az iot dps certificate create \
+#   --name "${ORGANIZATION}-ca" \
+#   --resource-group $DPS_GROUP \
+#   --dps-name $DPS \
+#   --path src/pki/certs/${ORGANIZATION}.root.ca.cert.pem \
+#   -oyaml
 
-# Retrieve the Certificate ETAG
-ETAG=$(az iot dps certificate show \
-        --name "${ORGANIZATION}-ca" \
-        --resource-group $DPS_GROUP \
-        --dps-name $DPS \
-        --query etag -otsv)
+# # Retrieve the Certificate ETAG
+# ETAG=$(az iot dps certificate show \
+#         --name "${ORGANIZATION}-ca" \
+#         --resource-group $DPS_GROUP \
+#         --dps-name $DPS \
+#         --query etag -otsv)
 
-# Generate a Verification Code for the Certificate
-CODE=$(az iot dps certificate generate-verification-code \
-                --name "${ORGANIZATION}-ca" \
-                --dps-name $DPS \
-                --resource-group $DPS_GROUP \
-                --etag $ETAG \
-                --query properties.verificationCode -otsv)
+# # Generate a Verification Code for the Certificate
+# CODE=$(az iot dps certificate generate-verification-code \
+#                 --name "${ORGANIZATION}-ca" \
+#                 --dps-name $DPS \
+#                 --resource-group $DPS_GROUP \
+#                 --etag $ETAG \
+#                 --query properties.verificationCode -otsv)
 
-# Generate a Verification Certificate signed by the Root CA to prove CA ownership
-./src/generate.sh verify $CODE
+# # Generate a Verification Certificate signed by the Root CA to prove CA ownership
+# ./src/generate.sh verify $CODE
 
-# Retrieve the Certificate ETAG which changed when the Verification Code was generated
-ETAG=$(az iot dps certificate show \
-        --name "${ORGANIZATION}-ca" \
-        --dps-name $DPS \
-        --resource-group $DPS_GROUP \
-        --query etag -otsv)
+# # Retrieve the Certificate ETAG which changed when the Verification Code was generated
+# ETAG=$(az iot dps certificate show \
+#         --name "${ORGANIZATION}-ca" \
+#         --dps-name $DPS \
+#         --resource-group $DPS_GROUP \
+#         --query etag -otsv)
 
-# Verify the CA Certificate with the Validation Certificate
-az iot dps certificate verify \
-  --name "${ORGANIZATION}-ca" \
-  --dps-name $DPS \
-  --resource-group $DPS_GROUP \
-  --etag $ETAG \
-  --path src/pki/certs/${ORGANIZATION}-verify.cert.pem \
-  -oyaml
+# # Verify the CA Certificate with the Validation Certificate
+# az iot dps certificate verify \
+#   --name "${ORGANIZATION}-ca" \
+#   --dps-name $DPS \
+#   --resource-group $DPS_GROUP \
+#   --etag $ETAG \
+#   --path src/pki/certs/${ORGANIZATION}-verify.cert.pem \
+#   -oyaml
 
 
 ####################################
@@ -282,4 +282,5 @@ az iot dps enrollment-group create \
   --enrollment-id ${ORGANIZATION} \
   --resource-group $DPS_GROUP \
   --dps-name $DPS \
-  --ca-name '${ORGANIZATION}-ca' -oyaml
+  --ca-name "${ORGANIZATION}-intermediate" -oyaml
+
