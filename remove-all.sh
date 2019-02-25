@@ -19,13 +19,13 @@ az group delete \
 printf "\n"
 tput setaf 2; echo "Removing Localhost Certificate Store" ; tput sgr0
 tput setaf 3; echo "------------------------------------" ; tput sgr0
-rm -rf "./src/pki"
+rm -rf ./src/pki
 
 # Remove ACI Deployments
 printf "\n"
 tput setaf 2; echo "Removing Localhost Certificate Store" ; tput sgr0
 tput setaf 3; echo "------------------------------------" ; tput sgr0
-rm -rf "./aci/*.yaml"
+rm -f ./aci/*.yaml
 
 
 # Remove the Environment File

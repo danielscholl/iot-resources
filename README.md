@@ -86,7 +86,7 @@ This script creates device certificates for use.
 ```bash
 # Usage            <type>  <name>
 ./device-cert.sh   self    self-signed-device
-./device-cert.sh   device  my-device
+./device-cert.sh   device  my-device  deploy (optional)
 ./device-cert.sh   edge    my-edge
 ./device-cert.sh   leaf    my-leaf
 ```
