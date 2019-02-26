@@ -104,7 +104,7 @@ function generate_device_certificate()
 
     aci_deploy ${1}
 
-    if [ ${2}="deploy" ]; then
+    if [[ $2 == "deploy" ]]; then
       printf "\n"
       tput setaf 2; echo "Deploying Device to ACI" ; tput sgr0
       tput setaf 3; echo "--------------------------" ; tput sgr0
@@ -121,7 +121,22 @@ function generate_edge_certificate()
 
   ./src/generate.sh edge $1
   create_chain $1
-  save_vault $1
+
+  ## Edge Devices have to have the Full Chain Certificates for Use
+  openssl pkcs12 -inkey ./src/pki/private/${1}.key.pem \
+                 -in ./src/pki/certs/${1}-chain.cert.pem \
+                 -chain -CAfile ./src/pki/certs/${ORGANIZATION}.chain.ca.cert.pem \
+                 -password pass:${INT_CA_PASSWORD} \
+                 -export -out ./src/pki/certs_pfx/${1}-chain.cert.pfx
+
+  printf "\n"
+  tput setaf 2; echo "Saving to Vault" ; tput sgr0
+  tput setaf 3; echo "---------------" ; tput sgr0
+  az keyvault certificate import \
+    --vault-name $VAULT \
+    --name ${1} \
+    --password ${INT_CA_PASSWORD} \
+    --file "./src/pki/certs_pfx/${1}-chain.cert.pfx" -oyaml
 }
 
 function generate_leaf_certificate()
