@@ -18,7 +18,7 @@
       "apiVersion": "2016-02-03",
       "location": "[resourceGroup().location]",
       "sku": {
-        "name": "S1",
+        "name": "S3",
         "tier": "Standard",
         "capacity": 1
       },
