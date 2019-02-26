@@ -94,22 +94,22 @@ function generate_device_certificate()
   ./src/generate.sh device $1
   create_chain $1
   save_vault $1
+  aci_deploy ${1}
 
-  # Create a Device Identity with a Self Signed x509
-  az iot hub device-identity create \
+  if [[ $2 == "deploy" ]]; then
+    tput setaf 2; echo "Creating Device Identity" ; tput sgr0
+    tput setaf 3; echo "--------------------------" ; tput sgr0
+    az iot hub device-identity create \
     --hub-name $HUB \
     --device-id $1 \
     --auth-method x509_ca \
     -oyaml
 
-    aci_deploy ${1}
-
-    if [[ $2 == "deploy" ]]; then
-      printf "\n"
-      tput setaf 2; echo "Deploying Device to ACI" ; tput sgr0
-      tput setaf 3; echo "--------------------------" ; tput sgr0
-      az container create --resource-group ${DPS_GROUP} --file aci/deploy-${1}.yaml -oyaml
-    fi
+    printf "\n"
+    tput setaf 2; echo "Deploying Device to ACI" ; tput sgr0
+    tput setaf 3; echo "--------------------------" ; tput sgr0
+    az container create --resource-group ${DPS_GROUP} --file aci/deploy-${1}.yaml -oyaml
+  fi
 }
 
 function generate_edge_certificate()
