@@ -27,10 +27,20 @@
     }
   },
   "variables": {
+    "appInsName": "[concat('in', uniqueString(resourceGroup().id))]",
     "omsWorkspaceName": "[concat('log', uniqueString(resourceGroup().id))]",
     "omsWorkspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('omsWorkspaceName'))]"
   },
   "resources": [
+    {
+      "apiVersion": "2014-04-01",
+      "name": "[variables('appInsName')]",
+      "type": "Microsoft.Insights/components",
+      "location": "[parameters('location')]",
+      "properties": {
+        "ApplicationId": "[variables('appInsName')]"
+      }
+    },
     {
       "type": "Microsoft.OperationalInsights/workspaces",
       "name": "[variables('omsWorkspaceName')]",
