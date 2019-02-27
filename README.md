@@ -90,3 +90,14 @@ This script creates device certificates for use.
 ./device-cert.sh   edge    my-edge
 ./device-cert.sh   leaf    my-leaf
 ```
+
+
+## Spin up Multiple Containers
+
+```bash
+COUNT=1
+until [ $COUNT -gt 50 ]; do
+./device-cert.sh leaf leaf$COUNT deploy
+let COUNT+=1
+done
+```
