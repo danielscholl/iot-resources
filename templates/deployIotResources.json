@@ -90,7 +90,7 @@
       "type": "Microsoft.Devices/provisioningServices",
       "name": "[variables('DpsName')]",
       "apiVersion": "2018-01-22",
-      "location": "[resourceGroup().location]",
+      "location": "eastus",
       "sku": {
         "name": "S1",
         "capacity": 1

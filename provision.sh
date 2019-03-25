@@ -14,7 +14,7 @@ usage() { echo "Usage: provision.sh " 1>&2; exit 1; }
 if [ -f ./.envrc ]; then source ./.envrc; fi
 
 if [ -z $AZURE_LOCATION ]; then
-  AZURE_LOCATION="eastus"
+  AZURE_LOCATION="eastus2"
 fi
 
 if [ -z $AZURE_GROUP ]; then
