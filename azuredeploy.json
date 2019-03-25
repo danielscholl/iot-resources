@@ -61,7 +61,7 @@
       }
     },
     {
-      "name": "TemplateStorageAccount",
+      "name": "TemplateStorage",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
       "resourceGroup": "[parameters('group')]",
