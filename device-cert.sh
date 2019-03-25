@@ -18,7 +18,6 @@ function aci_leaf_deploy() {
   b64_key=$(openssl base64 -in ./src/pki/private/${1}.key.pem |tr -d '\n')
   b64_ca=$(openssl base64 -in ./src/pki/certs/testonly.root.ca.cert.pem |tr -d '\n')
 
-
   cat > ./aci/deploy-${1}.yaml << EOF
 apiVersion: '2018-06-01'
 location: eastus
@@ -67,6 +66,8 @@ function aci_deploy() {
   tput setaf 2; echo "Creating ACI Deployment" ; tput sgr0
   tput setaf 3; echo "-----------------------" ; tput sgr0
 
+  APPINSIGHTS_INSTRUMENTATIONKEY=$(az resource list -g $DPS_GROUP --query "[?type=='Microsoft.Insights/components']".name -otsv)
+
   b64_cert=$(openssl base64 -in ./src/pki/certs/${1}-chain.cert.pem |tr -d '\n')
   b64_key=$(openssl base64 -in ./src/pki/private/${1}.key.pem |tr -d '\n')
   idScope=$(az iot dps list --resource-group $DPS_GROUP --query [0].properties.idScope -otsv)
@@ -86,6 +87,8 @@ properties:
           value: 'global.azure-devices-provisioning.net'
         - name: 'ID_SCOPE'
           value: '${idScope}'
+        - name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value: '${APPINSIGHTS_INSTRUMENTATIONKEY}'
       image: danielscholl/iot-device-js:latest
       ports: []
       resources:
