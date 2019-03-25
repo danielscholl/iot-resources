@@ -47,6 +47,7 @@ tput setaf 3; echo "------------------------------------" ; tput sgr0
 if [ -f ./params.json ]; then PARAMS="params.json"; else PARAMS="azuredeploy.parameters.json"; fi
 
 az deployment create --template-file azuredeploy.json  \
+  --name iot-resources \
   --location $AZURE_LOCATION \
   --parameters userObjectId=$USER_ID group=$AZURE_GROUP \
   -oyaml

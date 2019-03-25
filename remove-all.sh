@@ -9,6 +9,11 @@
 printf "\n"
 tput setaf 2; echo "Removing Azure Resource Group" ; tput sgr0
 tput setaf 3; echo "-----------------------------" ; tput sgr0
+az deployment delete \
+  --name iot-resources \
+  --no-wait \
+  -oyaml
+
 az group delete \
   --name $DPS_GROUP \
   --yes \
