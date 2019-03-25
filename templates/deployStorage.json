@@ -24,7 +24,7 @@
       "comments": "## Storage Account ##",
       "name": "[variables('storageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-07-01",
+      "apiVersion": "2018-11-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "Storage Account"
@@ -35,6 +35,7 @@
         "tier": "Standard"
       },
       "properties": {
+        "accessTier": "Hot",
         "encryption": {
           "keySource": "Microsoft.Storage",
           "services": {
@@ -48,7 +49,7 @@
         {
           "name": "telemetry",
           "type": "blobServices/containers",
-          "apiVersion": "2018-07-01",
+          "apiVersion": "2018-11-01",
           "dependsOn": [
             "[variables('storageAccountName')]"
           ]
@@ -56,7 +57,7 @@
         {
           "name": "eph",
           "type": "blobServices/containers",
-          "apiVersion": "2018-07-01",
+          "apiVersion": "2018-11-01",
           "dependsOn": [
             "[variables('storageAccountName')]"
           ]
