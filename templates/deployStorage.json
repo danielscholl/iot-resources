@@ -42,8 +42,7 @@
               "enabled": true
             }
           }
-        },
-        "accessTier": "Hot"
+        }
       },
       "resources": [
         {
