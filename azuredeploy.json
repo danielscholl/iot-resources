@@ -75,8 +75,8 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "userObjectId": {
-            "value": "[parameters('userObjectId')]"
+          "storageAccountType": {
+            "value": "Standard_LRS"
           }
         }
       }
