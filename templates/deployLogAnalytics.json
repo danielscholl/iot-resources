@@ -2,17 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "location": {
-      "type": "string",
-      "allowedValues": [
-        "eastus",
-        "westus"
-      ],
-      "defaultValue": "eastus",
-      "metadata": {
-        "description": "Specifies the location in which to create the workspace."
-      }
-    },
     "sku": {
       "type": "string",
       "allowedValues": [
@@ -36,7 +25,7 @@
       "apiVersion": "2014-04-01",
       "name": "[variables('appInsName')]",
       "type": "Microsoft.Insights/components",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "properties": {
         "ApplicationId": "[variables('appInsName')]"
       }
@@ -45,7 +34,7 @@
       "type": "Microsoft.OperationalInsights/workspaces",
       "name": "[variables('omsWorkspaceName')]",
       "apiVersion": "2015-11-01-preview",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "properties": {
         "sku": {
           "name": "[parameters('sku')]"
