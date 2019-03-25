@@ -1,14 +1,28 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "parameters": {},
+  "parameters": {
+    "storageAccount": {
+      "type": "string",
+      "metadata": {
+        "description": "Diagnostics Storage Account Name"
+      }
+    },
+    "storageKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Diagnostics Storage Account Key"
+      }
+    }
+  },
   "variables": {
     "IotHubName": "[concat('hub', uniqueString(resourceGroup().id))]",
     "IotHubId": "[resourceId('Microsoft.Devices/IotHubs', variables('IotHubName'))]",
     "IotHubKeyName": "iothubowner",
     "IotHubKeyResource": "[resourceId('Microsoft.Devices/Iothubs/Iothubkeys', variables('iotHubName'), variables('iotHubKeyName'))]",
     "DpsName": "[concat('dps', uniqueString(resourceGroup().id))]",
-    "DpsId": "[resourceId('Microsoft.Devices/provisioningServices', variables('DpsName'))]"
+    "DpsId": "[resourceId('Microsoft.Devices/provisioningServices', variables('DpsName'))]",
+    "ConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccount'), ';AccountKey=', parameters('storageKey'))]"
   },
   "resources": [
     {
@@ -23,7 +37,50 @@
         "capacity": 1
       },
       "properties": {
-        "location": "[resourceGroup().location]"
+        "routing": {
+          "endpoints": {
+            "storageContainers": [
+              {
+                "connectionString": "[variables('ConnectionString')]",
+                "containerName": "telemetry",
+                "fileNameFormat": "{iothub}/{partition}/{YYYY}/{MM}/{DD}/{HH}/{mm}",
+                "batchFrequencyInSeconds": 100,
+                "maxChunkSizeInBytes": 104857600,
+                "encoding": "avro",
+                "name": "storage"
+              }
+            ]
+          },
+          "routes": [
+            {
+              "name": "hotPath",
+              "source": "DeviceMessages",
+              "condition": "true",
+              "endpointNames": [
+                "events"
+              ],
+              "isEnabled": true
+            },
+            {
+              "name": "coldPath",
+              "source": "DeviceMessages",
+              "condition": "true",
+              "endpointNames": [
+                "storage"
+              ],
+              "isEnabled": true
+            }
+          ],
+          "fallbackRoute": {
+            "name": "$fallback",
+            "source": "DeviceMessages",
+            "condition": "true",
+            "endpointNames": [
+              "events"
+            ],
+            "isEnabled": true
+          }
+        }
       }
     },
     {

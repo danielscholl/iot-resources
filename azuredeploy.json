@@ -61,6 +61,27 @@
       }
     },
     {
+      "name": "TemplateStorageAccount",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "resourceGroup": "[parameters('group')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/resourceGroups/', parameters('group'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('templateURL'), 'deployStorage.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "userObjectId": {
+            "value": "[parameters('userObjectId')]"
+          }
+        }
+      }
+    },
+    {
       "name": "TemplateLogAnalytics",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
@@ -84,7 +105,8 @@
       "resourceGroup": "[parameters('group')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/resourceGroups/', parameters('group'))]",
-        "TemplateLogAnalytics"
+        "TemplateLogAnalytics",
+        "TemplateStorage"
       ],
       "properties": {
         "mode": "Incremental",
@@ -92,7 +114,14 @@
           "uri": "[concat(parameters('templateURL'), 'deployIotResources.json')]",
           "contentVersion": "1.0.0.0"
         },
-        "parameters": {}
+        "parameters": {
+          "storageAccount": {
+            "value": "[reference('TemplateStorage').outputs.storageAccount.value.name]"
+          },
+          "storageKey": {
+            "value": "[reference('TemplateStorage').outputs.storageAccount.value.key]"
+          }
+        }
       }
     }
   ],
