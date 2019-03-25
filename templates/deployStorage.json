@@ -44,24 +44,27 @@
           }
         }
       },
-      "resources": [
-        {
-          "name": "telemetry",
-          "type": "blobServices/containers",
-          "apiVersion": "2018-11-01",
-          "dependsOn": [
-            "[variables('storageAccountName')]"
-          ]
-        },
-        {
-          "name": "eph",
-          "type": "blobServices/containers",
-          "apiVersion": "2018-11-01",
-          "dependsOn": [
-            "[variables('storageAccountName')]"
-          ]
-        }
-      ]
+      "resources": []
+    },
+    {
+      "name": "telemetry",
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2018-11-01",
+      "dependsOn": [
+        "[variables('storageAccountName')]"
+      ],
+      "properties": {},
+      "resources": []
+    },
+    {
+      "name": "eph",
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2018-11-01",
+      "dependsOn": [
+        "[variables('storageAccountName')]"
+      ],
+      "properties": {},
+      "resources": []
     }
   ],
   "outputs": {
