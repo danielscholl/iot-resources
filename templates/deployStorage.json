@@ -35,7 +35,6 @@
         "tier": "Standard"
       },
       "properties": {
-        "accessTier": "Hot",
         "encryption": {
           "keySource": "Microsoft.Storage",
           "services": {
