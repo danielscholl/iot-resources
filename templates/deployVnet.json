@@ -1,0 +1,152 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "prefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Small unique string."
+      },
+      "defaultValue": "iot"
+    },
+    "vnetPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network Address Prefix CIDR"
+      },
+      "defaultValue": "10.0.0.0/16"
+    },
+    "subnet1Prefix": {
+      "type": "string",
+      "metadata": {
+        "description": "ContainerTier Address Prefix CIDR"
+      },
+      "defaultValue": "10.0.0.0/20"
+    },
+    "subnet2Prefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Edge Address Prefix CIDR"
+      },
+      "defaultValue": "10.0.16.0/24"
+    }
+  },
+  "variables": {
+    "VNetName": "[concat(parameters('prefix'), '-vnet')]",
+    "VNetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('VNetName'))]",
+    "Subnet1Name": "aks_subnet",
+    "SubNet1Id": "[concat(variables('VNetId'), '/subnets/', variables('Subnet1Name'))]",
+    "Subnet2Name": "edge_subnet",
+    "SubNet2Id": "[concat(variables('VNetId'), '/subnets/', variables('Subnet2Name'))]",
+    "Nsg1Name": "[concat(variables('VNetName'), '-', variables('Subnet1Name'), '-nsg')]",
+    "Nsg1Id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('Nsg1Name'))]",
+    "Nsg2Name": "[concat(variables('VNetName'), '-', variables('Subnet2Name'), '-nsg')]",
+    "Nsg2Id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('Nsg2Name'))]"
+  },
+  "resources": [
+    {
+      "comments": "## Network Security Group ##",
+      "name": "[variables('nsg1Name')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[resourceGroup().location]",
+      "tags": {},
+      "properties": {
+        "securityRules": []
+      }
+    },
+    {
+      "comments": "## Network Security Group ##",
+      "name": "[variables('nsg2Name')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "Network Security Group - dmz"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "SSH",
+            "properties": {
+              "priority": 1001,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "Internet",
+              "destinationAddressPrefix": "*",
+              "description": "ssh-for-vm-management"
+            }
+          },
+          {
+            "name": "RDP",
+            "properties": {
+              "priority": 1002,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "description": "rdp-for-vm-management"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "comments": "## Virtual Network ##",
+      "name": "[variables('VNetName')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2016-03-30",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[variables('Nsg1Id')]",
+        "[variables('Nsg2Id')]"
+      ],
+      "tags": {
+        "displayName": "Virtual Network"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('VNetPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('Subnet1Name')]",
+            "properties": {
+              "addressPrefix": "[parameters('Subnet1Prefix')]"
+            }
+          },
+          {
+            "name": "[variables('Subnet2Name')]",
+            "properties": {
+              "addressPrefix": "[parameters('Subnet2Prefix')]"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "virtualNetwork": {
+      "type": "object",
+      "value": {
+        "id": "[variables('VNetId')]",
+        "name": "[variables('VNetName')]"
+      }
+    },
+    "subnets": {
+      "type": "object",
+      "value": {
+        "subnet1Id": "[variables('subnet1Id')]",
+        "subnet2Id": "[variables('subnet2Id')]"
+      }
+    }
+  }
+}

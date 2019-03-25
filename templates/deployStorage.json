@@ -24,47 +24,34 @@
       "comments": "## Storage Account ##",
       "name": "[variables('storageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2018-07-01",
       "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "Storage Account"
-      },
-      "kind": "Storage",
+      "kind": "StorageV2",
       "sku": {
         "name": "[parameters('storageAccountType')]",
         "tier": "Standard"
       },
       "properties": {
-        "encryption": {
-          "keySource": "Microsoft.Storage",
-          "services": {
-            "blob": {
-              "enabled": true
-            }
-          }
-        }
+        "accessTier": "Hot"
       },
-      "resources": []
-    },
-    {
-      "name": "telemetry",
-      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-      "apiVersion": "2018-11-01",
-      "dependsOn": [
-        "[variables('storageAccountName')]"
-      ],
-      "properties": {},
-      "resources": []
-    },
-    {
-      "name": "eph",
-      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-      "apiVersion": "2018-11-01",
-      "dependsOn": [
-        "[variables('storageAccountName')]"
-      ],
-      "properties": {},
-      "resources": []
+      "resources": [
+        {
+          "name": "[concat('default/', 'telemetry')]",
+          "type": "blobServices/containers",
+          "apiVersion": "2018-07-01",
+          "dependsOn": [
+            "[variables('storageAccountName')]"
+          ]
+        },
+        {
+          "name": "[concat('default/', 'eph')]",
+          "type": "blobServices/containers",
+          "apiVersion": "2018-07-01",
+          "dependsOn": [
+            "[variables('storageAccountName')]"
+          ]
+        }
+      ]
     }
   ],
   "outputs": {

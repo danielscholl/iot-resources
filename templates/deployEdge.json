@@ -9,19 +9,23 @@
       },
       "defaultValue": "edge"
     },
-    "vnetPrefix": {
+    "vnetGroup": {
       "type": "string",
       "metadata": {
-        "description": "Virtual Network Address Prefix CIDR"
-      },
-      "defaultValue": "10.1.0.0/24"
+        "description": "Name of the existing VNET resource group"
+      }
     },
-    "subnetPrefix": {
+    "vnet": {
       "type": "string",
       "metadata": {
-        "description": "Subnet 1 Address Prefix CIDR"
-      },
-      "defaultValue": "10.1.0.0/24"
+        "description": "Name of the existing VNET"
+      }
+    },
+    "subnet": {
+      "type": "string",
+      "metadata": {
+        "description": "Subnet ID to associate VM to."
+      }
     },
     "vmSize": {
       "type": "string",
@@ -66,13 +70,9 @@
     }
   },
   "variables": {
-    "VNetName": "[concat(parameters('prefix'), '-vnet')]",
-    "VNetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('VNetName'))]",
-    "SubnetName": "edge_subnet",
-    "SubNetId": "[concat(variables('VNetId'), '/subnets/', variables('SubnetName'))]",
-    "NsgName": "[concat(variables('SubnetName'), '-nsg')]",
-    "NsgId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NsgName'))]",
     "cleanPrefix": "[toLower(parameters('prefix'))]",
+    "vnetID": "[resourceId(parameters('vnetGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnet'))]",
+    "subnetId": "[concat(variables('vnetID'),'/subnets/', parameters('subnet'))]",
     "vmName": "[concat(variables('cleanPrefix'), '-vm')]",
     "PublicIpName": "[concat(variables('vmName'), '-ip')]",
     "PublicIpId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('PublicIpName'))]",
@@ -81,47 +81,6 @@
     "sshKeyPath": "[concat('/home/',parameters('adminUserName'),'/.ssh/authorized_keys')]"
   },
   "resources": [
-    {
-      "comments": "## Network Security Group ##",
-      "name": "[variables('nsgName')]",
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2015-05-01-preview",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "Network Security Group - dmz"
-      },
-      "properties": {
-        "securityRules": []
-      }
-    },
-    {
-      "comments": "## Virtual Network ##",
-      "name": "[variables('VNetName')]",
-      "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2016-03-30",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[variables('NsgId')]"
-      ],
-      "tags": {
-        "displayName": "Virtual Network"
-      },
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[parameters('VNetPrefix')]"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[variables('SubnetName')]",
-            "properties": {
-              "addressPrefix": "[parameters('SubnetPrefix')]"
-            }
-          }
-        ]
-      }
-    },
     {
       "comments": "## Public IP Address ##",
       "type": "Microsoft.Network/publicIPAddresses",
@@ -145,8 +104,7 @@
         "Company": "[parameters('prefix')]"
       },
       "dependsOn": [
-        "[variables('PublicIpId')]",
-        "[variables('VNetId')]"
+        "[variables('PublicIpId')]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -217,19 +175,5 @@
       "resources": []
     }
   ],
-  "outputs": {
-    "virtualNetwork": {
-      "type": "object",
-      "value": {
-        "id": "[variables('VNetId')]",
-        "name": "[variables('VNetName')]"
-      }
-    },
-    "subnets": {
-      "type": "object",
-      "value": {
-        "subnet1Id": "[variables('subnetId')]"
-      }
-    }
-  }
+  "outputs": {}
 }
