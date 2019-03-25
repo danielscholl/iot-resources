@@ -7,7 +7,7 @@
       "metadata": {
         "description": "Small unique string."
       },
-      "defaultValue": "eastus"
+      "defaultValue": "eastus2"
     },
     "group": {
       "type": "string",
