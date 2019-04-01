@@ -14,7 +14,7 @@ usage() { echo "Usage: provision.sh " 1>&2; exit 1; }
 if [ -f ./.envrc ]; then source ./.envrc; fi
 
 if [ -z $AZURE_LOCATION ]; then
-  AZURE_LOCATION="eastus2"
+  AZURE_LOCATION="centralus"
 fi
 
 if [ -z $AZURE_GROUP ]; then
@@ -49,7 +49,7 @@ if [ -f ./params.json ]; then PARAMS="params.json"; else PARAMS="azuredeploy.par
 az deployment create --template-file azuredeploy.json  \
   --name iot-resources \
   --location $AZURE_LOCATION \
-  --parameters userObjectId=$USER_ID group=$AZURE_GROUP \
+  --parameters userObjectId=$USER_ID group=$AZURE_GROUP location=$AZURE_LOCATION \
   -oyaml
 
 ##############################
