@@ -33,7 +33,7 @@ properties:
           value: '${2}'
         - name: 'EDGE_GATEWAY'
           value: '$EDGE_GATEWAY'
-      image: danielscholl/iot-device-net:latest
+      image: danielscholl/iot-device-js:latest
       ports: []
       resources:
         requests:
@@ -89,7 +89,7 @@ properties:
           value: '${idScope}'
         - name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
           value: '${APPINSIGHTS_INSTRUMENTATIONKEY}'
-      image: danielscholl/iot-device-net:latest
+      image: danielscholl/iot-device-js:latest
       ports: []
       resources:
         requests:
