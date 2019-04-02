@@ -33,7 +33,7 @@ properties:
           value: '${2}'
         - name: 'EDGE_GATEWAY'
           value: '$EDGE_GATEWAY'
-      image: danielscholl/iot-device-js:latest
+      image: danielscholl/iot-device-net:latest
       ports: []
       resources:
         requests:
