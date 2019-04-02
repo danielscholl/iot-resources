@@ -89,7 +89,7 @@ properties:
           value: '${idScope}'
         - name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
           value: '${APPINSIGHTS_INSTRUMENTATIONKEY}'
-      image: danielscholl/iot-device-js:latest
+      image: danielscholl/iot-device-net:latest
       ports: []
       resources:
         requests:
