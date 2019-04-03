@@ -14,6 +14,10 @@ function aci_leaf_deploy() {
   tput setaf 2; echo "Creating ACI Deployment" ; tput sgr0
   tput setaf 3; echo "-----------------------" ; tput sgr0
 
+  APPINSIGHTS=$(az resource list -g $DPS_GROUP --query "[?type=='Microsoft.Insights/components']".name -otsv)
+  APPINSIGHTS_INSTRUMENTATIONKEY=$(az resource show -g $DPS_GROUP -n $APPINSIGHTS --resource-type "Microsoft.Insights/components" --query properties.InstrumentationKey -otsv)
+
+
   b64_cert=$(openssl base64 -in ./src/pki/certs/${1}-chain.cert.pem |tr -d '\n')
   b64_key=$(openssl base64 -in ./src/pki/private/${1}.key.pem |tr -d '\n')
   b64_ca=$(openssl base64 -in ./src/pki/certs/testonly.root.ca.cert.pem |tr -d '\n')
@@ -33,6 +37,8 @@ properties:
           value: '${2}'
         - name: 'EDGE_GATEWAY'
           value: '$EDGE_GATEWAY'
+        - name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value: '${APPINSIGHTS_INSTRUMENTATIONKEY}'
       image: danielscholl/iot-device-js:latest
       ports: []
       resources:
@@ -66,7 +72,8 @@ function aci_deploy() {
   tput setaf 2; echo "Creating ACI Deployment" ; tput sgr0
   tput setaf 3; echo "-----------------------" ; tput sgr0
 
-  APPINSIGHTS_INSTRUMENTATIONKEY=$(az resource list -g $DPS_GROUP --query "[?type=='Microsoft.Insights/components']".name -otsv)
+  APPINSIGHTS=$(az resource list -g $DPS_GROUP --query "[?type=='Microsoft.Insights/components']".name -otsv)
+  APPINSIGHTS_INSTRUMENTATIONKEY=$(az resource show -g $DPS_GROUP -n $APPINSIGHTS --resource-type "Microsoft.Insights/components" --query properties.InstrumentationKey -otsv)
 
   b64_cert=$(openssl base64 -in ./src/pki/certs/${1}-chain.cert.pem |tr -d '\n')
   b64_key=$(openssl base64 -in ./src/pki/private/${1}.key.pem |tr -d '\n')
@@ -211,10 +218,10 @@ function generate_leaf_certificate()
     az iot hub device-identity create -d $1 -n $HUB -oyaml
     aci_leaf_deploy ${1} $(az iot hub device-identity show-connection-string --hub-name $HUB --device-id $1 -otsv)
 
-    # printf "\n"
-    # tput setaf 2; echo "Deploying Device to ACI" ; tput sgr0
-    # tput setaf 3; echo "--------------------------" ; tput sgr0
-    # az container create --resource-group ${DPS_GROUP} --file aci/deploy-${1}.yaml -oyaml
+    printf "\n"
+    tput setaf 2; echo "Deploying Device to ACI" ; tput sgr0
+    tput setaf 3; echo "--------------------------" ; tput sgr0
+    az container create --resource-group ${DPS_GROUP} --file aci/deploy-${1}.yaml -oyaml
   fi
 }
 

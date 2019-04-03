@@ -98,9 +98,9 @@ This script creates device certificates for use.
 ```bash
 # Usage            <type>  <name>
 ./device-cert.sh   self    self-signed-device
-./device-cert.sh   device  my-device  deploy (optional)
-./device-cert.sh   edge    my-edge
-./device-cert.sh   leaf    my-leaf
+./device-cert.sh   device  device  deploy (optional)
+./device-cert.sh   edge    edge
+EDGE_GATEWAY="edge" ./device-cert.sh   leaf    leaf
 ```
 
 
@@ -109,7 +109,7 @@ This script creates device certificates for use.
 ```bash
 COUNT=1
 until [ $COUNT -gt 50 ]; do
-./device-cert.sh leaf leaf$COUNT deploy
+EDGE_GATEWAY="edge" ./device-cert.sh leaf leaf$COUNT deploy
 let COUNT+=1
 done
 ```
