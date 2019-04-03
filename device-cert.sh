@@ -17,7 +17,6 @@ function aci_leaf_deploy() {
   APPINSIGHTS=$(az resource list -g $DPS_GROUP --query "[?type=='Microsoft.Insights/components']".name -otsv)
   APPINSIGHTS_INSTRUMENTATIONKEY=$(az resource show -g $DPS_GROUP -n $APPINSIGHTS --resource-type "Microsoft.Insights/components" --query properties.InstrumentationKey -otsv)
 
-
   b64_cert=$(openssl base64 -in ./src/pki/certs/${1}-chain.cert.pem |tr -d '\n')
   b64_key=$(openssl base64 -in ./src/pki/private/${1}.key.pem |tr -d '\n')
   b64_ca=$(openssl base64 -in ./src/pki/certs/testonly.root.ca.cert.pem |tr -d '\n')
