@@ -52,8 +52,6 @@ properties:
   volumes:
   - name: certvolume
     secret:
-      device-cert.pem: ${b64_cert}
-      device-key.pem: ${b64_key}
       root-ca.pem: ${b64_ca}
 tags: {}
 type: Microsoft.ContainerInstance/containerGroups
