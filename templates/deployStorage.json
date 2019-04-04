@@ -50,6 +50,14 @@
           "dependsOn": [
             "[variables('storageAccountName')]"
           ]
+        },
+        {
+          "name": "[concat('default/', 'datapoints')]",
+          "type": "blobServices/containers",
+          "apiVersion": "2018-07-01",
+          "dependsOn": [
+            "[variables('storageAccountName')]"
+          ]
         }
       ]
     }

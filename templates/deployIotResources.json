@@ -138,25 +138,25 @@
         "dataLocale": "en-US",
         "inputs": [
           {
-            "Name": "IoTHub",
-            "Properties": {
-              "DataSource": {
-                "Properties": {
+            "name": "datapoints",
+            "properties": {
+              "datasource": {
+                "properties": {
                   "iotHubNamespace": "[variables('iothubname')]",
                   "sharedAccessPolicyKey": "[listkeys(resourceId('Microsoft.Devices/IotHubs/IotHubKeys',variables('iothubname'), 'iothubowner'),'2016-02-03').primaryKey]",
                   "sharedAccessPolicyName": "iothubowner",
                   "endpoint": "messages/events",
                   "consumerGroupName": "streaming"
                 },
-                "Type": "Microsoft.Devices/IotHubs"
+                "type": "Microsoft.Devices/IotHubs"
               },
-              "Serialization": {
-                "Properties": {
-                  "Encoding": "UTF8"
+              "serialization": {
+                "properties": {
+                  "encoding": "UTF8"
                 },
-                "Type": "Json"
+                "type": "Json"
               },
-              "Type": "Stream"
+              "type": "Stream"
             }
           }
         ],
@@ -164,10 +164,34 @@
           "name": "Transformation",
           "properties": {
             "streamingUnits": 1,
-            "query": "SELECT\r\n    *\r\nINTO\r\n    [PBI]\r\nFROM\r\n    [IoTHub]"
+            "query": "SELECT\r\n    DeviceId = datapoints.iothub.connectionDeviceId,\r\n    'wind' = AVG(windSpeed),\r\n    'humidity' = AVG(humidity),\r\n    'min-W' = MIN(windSpeed),\r\n    'min-H' = MIN(humidity),\r\n    'max-W' = MAX(windSpeed),\r\n    'max-H' = MAX(humidity),\r\n    WindowEndTime = (System.Timestamp)\r\nINTO\r\n   [blobstorage]\r\nFROM\r\n    [datapoints]\r\n    TIMESTAMP BY\r\n        datapoints.iothub.enqueuedTime\r\nGROUP BY\r\n    datapoints.iothub.connectionDeviceId,\r\n    TumblingWindow(second, 30)"
           }
         },
-        "outputs": []
+        "outputs": [
+          {
+            "name": "blobstorage",
+            "properties": {
+              "datasource": {
+                "type": "Microsoft.Storage/Blob",
+                "properties": {
+                  "storageAccounts": [
+                    {
+                      "accountName": "[parameters('storageAccount')]",
+                      "accountKey": "[parameters('storageKey')]"
+                    }
+                  ],
+                  "container": "datapoints"
+                }
+              },
+              "serialization": {
+                "properties": {
+                  "encoding": "UTF8"
+                },
+                "type": "Json"
+              }
+            }
+          }
+        ]
       }
     }
   ],
