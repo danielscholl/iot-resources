@@ -180,7 +180,8 @@
                       "accountKey": "[parameters('storageKey')]"
                     }
                   ],
-                  "container": "datapoints"
+                  "container": "datapoints",
+                  "pathPattern": "year={datetime:yyyy}/month={datetime:MM}/day={datetime:dd}/hour={datetime:HH}"
                 }
               },
               "serialization": {
