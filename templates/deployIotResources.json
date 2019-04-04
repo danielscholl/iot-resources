@@ -20,6 +20,7 @@
     "IotHubId": "[resourceId('Microsoft.Devices/IotHubs', variables('IotHubName'))]",
     "IotHubKeyName": "iothubowner",
     "IotHubKeyResource": "[resourceId('Microsoft.Devices/Iothubs/Iothubkeys', variables('iotHubName'), variables('iotHubKeyName'))]",
+    "consumerGroupName": "[concat(variables('iotHubName'), '/events/streaming')]",
     "DpsName": "[concat('dps', uniqueString(resourceGroup().id))]",
     "DpsId": "[resourceId('Microsoft.Devices/provisioningServices', variables('DpsName'))]",
     "AnalyticsJobName": "[concat('asa', uniqueString(resourceGroup().id))]",
@@ -86,6 +87,14 @@
       }
     },
     {
+      "type": "Microsoft.Devices/iotHubs/eventhubEndpoints/ConsumerGroups",
+      "apiVersion": "2018-04-01",
+      "name": "[variables('ConsumerGroupName')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Devices/IotHubs', variables('iotHubName'))]"
+      ]
+    },
+    {
       "comments": "## Device Provisioning Service ##",
       "type": "Microsoft.Devices/provisioningServices",
       "name": "[variables('DpsName')]",
@@ -134,7 +143,8 @@
                   "iotHubNamespace": "[variables('iothubname')]",
                   "sharedAccessPolicyKey": "[listkeys(resourceId('Microsoft.Devices/IotHubs/IotHubKeys',variables('iothubname'), 'iothubowner'),'2016-02-03').primaryKey]",
                   "sharedAccessPolicyName": "iothubowner",
-                  "endpoint": "messages/events"
+                  "endpoint": "messages/events",
+                  "consumerGroupName": "default"
                 },
                 "Type": "Microsoft.Devices/IotHubs"
               },

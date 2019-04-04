@@ -34,6 +34,8 @@ properties:
           value: '${1}'
         - name: 'DEVICE_CONNECTION_STRING'
           value: '${2}'
+        - name: 'PROTOCOL'
+          value: 'MQTT'
         - name: 'EDGE_GATEWAY'
           value: '$EDGE_GATEWAY'
         - name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
