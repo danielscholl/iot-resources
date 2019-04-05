@@ -106,9 +106,19 @@ EDGE_GATEWAY="edge" ./device-cert.sh   leaf    leaf
 
 ## Spin up Multiple Containers
 
+Devices
 ```bash
 COUNT=1
-until [ $COUNT -gt 50 ]; do
+until [ $COUNT -gt 10 ]; do
+./device-cert.sh device device$COUNT deploy
+let COUNT+=1
+done
+```
+
+Downstream Devices
+```bash
+COUNT=1
+until [ $COUNT -gt 10 ]; do
 EDGE_GATEWAY="edge" ./device-cert.sh leaf leaf$COUNT deploy
 let COUNT+=1
 done

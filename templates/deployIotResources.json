@@ -20,7 +20,8 @@
     "IotHubId": "[resourceId('Microsoft.Devices/IotHubs', variables('IotHubName'))]",
     "IotHubKeyName": "iothubowner",
     "IotHubKeyResource": "[resourceId('Microsoft.Devices/Iothubs/Iothubkeys', variables('iotHubName'), variables('iotHubKeyName'))]",
-    "consumerGroupName": "[concat(variables('iotHubName'), '/events/streaming')]",
+    "ConsumerGroupName": "[concat(variables('iotHubName'), '/events/streaming')]",
+    "TSIConsumerGroup": "[concat(variables('iotHubName'), '/events/tsi')]",
     "DpsName": "[concat('dps', uniqueString(resourceGroup().id))]",
     "DpsId": "[resourceId('Microsoft.Devices/provisioningServices', variables('DpsName'))]",
     "AnalyticsJobName": "[concat('asa', uniqueString(resourceGroup().id))]",
@@ -91,6 +92,16 @@
       "type": "Microsoft.Devices/iotHubs/eventhubEndpoints/ConsumerGroups",
       "apiVersion": "2018-04-01",
       "name": "[variables('ConsumerGroupName')]",
+      "properties": {},
+      "dependsOn": [
+        "[resourceId('Microsoft.Devices/IotHubs', variables('iotHubName'))]"
+      ]
+    },
+    {
+      "comments": "## Consumer Group ##",
+      "type": "Microsoft.Devices/iotHubs/eventhubEndpoints/ConsumerGroups",
+      "apiVersion": "2018-04-01",
+      "name": "[variables('TSIConsumerGroup')]",
       "properties": {},
       "dependsOn": [
         "[resourceId('Microsoft.Devices/IotHubs', variables('iotHubName'))]"
