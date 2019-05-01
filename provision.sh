@@ -13,13 +13,18 @@ usage() { echo "Usage: provision.sh " 1>&2; exit 1; }
 
 if [ -f ./.envrc ]; then source ./.envrc; fi
 
+if [ ! -z $1 ]; then PREFIX=$1; fi
+if [ -z $PREFIX ]; then
+  PREFIX="iot"
+fi
+
 if [ -z $AZURE_LOCATION ]; then
   AZURE_LOCATION="centralus"
 fi
 
-if [ -z $AZURE_GROUP ]; then
-  AZURE_GROUP="iot-resources"
-fi
+# if [ -z $AZURE_GROUP ]; then
+#   AZURE_GROUP="iot-resources"
+# fi
 
 if [ -z $ORGANIZATION ]; then
   ORGANIZATION="testonly"
@@ -41,6 +46,13 @@ USER_ID=$(az ad user show \
 ##############################
 ## Deploy ARM Resources     ##
 ##############################
+
+printf "\n"
+tput setaf 2; echo "Defining the Resource Group" ; tput sgr0
+tput setaf 3; echo "------------------------------------" ; tput sgr0
+AZURE_GROUP="$PREFIX-resources"
+tput setaf 3; echo "Resource Group = $AZURE_GROUP"
+
 printf "\n"
 tput setaf 2; echo "Deploying the ARM Templates" ; tput sgr0
 tput setaf 3; echo "------------------------------------" ; tput sgr0
