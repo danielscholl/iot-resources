@@ -112,7 +112,7 @@
       "type": "Microsoft.Devices/provisioningServices",
       "name": "[variables('DpsName')]",
       "apiVersion": "2018-01-22",
-      "location": "eastus",
+      "location": "usgovvirginia",
       "sku": {
         "name": "S1",
         "capacity": 1
