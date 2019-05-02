@@ -92,7 +92,7 @@
       "type": "object",
       "value": {
         "id": "[variables('IotHubId')]",
-        "keys": "[listKeys(resourceId('Microsoft.Devices/IotHubs', variables('IotHubName')), '2016-02-03')]"
+        "keys": "[listKeys(resourceId('Microsoft.Devices/IotHubs', variables('IotHubName')), '2018-12-01-preview')]"
       }
     }
   }
