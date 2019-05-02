@@ -42,19 +42,7 @@
       },
       "properties": {
         "routing": {
-          "endpoints": {
-            "storageContainers": [
-              {
-                "connectionString": "[variables('ConnectionString')]",
-                "containerName": "telemetry",
-                "fileNameFormat": "{iothub}/{partition}/{YYYY}/{MM}/{DD}/{HH}/{mm}",
-                "batchFrequencyInSeconds": 100,
-                "maxChunkSizeInBytes": 104857600,
-                "encoding": "avro",
-                "name": "storage"
-              }
-            ]
-          },
+          "endpoints": {},
           "routes": [
             {
               "name": "hotPath",
@@ -62,15 +50,6 @@
               "condition": "true",
               "endpointNames": [
                 "events"
-              ],
-              "isEnabled": true
-            },
-            {
-              "name": "coldPath",
-              "source": "DeviceMessages",
-              "condition": "true",
-              "endpointNames": [
-                "storage"
               ],
               "isEnabled": true
             }
