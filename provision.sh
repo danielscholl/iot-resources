@@ -19,7 +19,7 @@ if [ -z $PREFIX ]; then
 fi
 
 if [ -z $AZURE_LOCATION ]; then
-  AZURE_LOCATION="usgovvirginia"
+  AZURE_LOCATION="usgovtexas"
 fi
 
 if [ -z $ORGANIZATION ]; then
