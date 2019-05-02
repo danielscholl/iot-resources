@@ -85,105 +85,6 @@
       "dependsOn": [
         "[resourceId('Microsoft.Devices/IotHubs', variables('iotHubName'))]"
       ]
-    },
-    {
-      "comments": "## Device Provisioning Service ##",
-      "type": "Microsoft.Devices/provisioningServices",
-      "name": "[variables('DpsName')]",
-      "apiVersion": "2018-01-22",
-      "location": "usgovvirginia",
-      "sku": {
-        "name": "S1",
-        "capacity": 1
-      },
-      "properties": {
-        "iotHubs": [
-          {
-            "connectionString": "[concat('HostName=', reference(variables('IotHubId')).hostName, ';SharedAccessKeyName=', variables('IotHubKeyName'), ';SharedAccessKey=', listkeys(variables('iotHubKeyResource'), '2017-07-01').primaryKey)]",
-            "location": "[resourceGroup().location]",
-            "name": "[concat(variables('IotHubName'),'.azure-devices.net')]"
-          }
-        ]
-      },
-      "dependsOn": [
-        "[variables('IotHubName')]"
-      ]
-    },
-    {
-      "apiVersion": "2016-03-01",
-      "name": "[variables('AnalyticsJobName')]",
-      "location": "[resourceGroup().location]",
-      "type": "Microsoft.StreamAnalytics/StreamingJobs",
-      "dependsOn": [
-        "[concat('Microsoft.Devices/IotHubs/', variables('iotHubName'))]"
-      ],
-      "properties": {
-        "sku": {
-          "name": "standard"
-        },
-        "outputErrorPolicy": "stop",
-        "eventsOutOfOrderPolicy": "adjust",
-        "eventsOutOfOrderMaxDelayInSeconds": 0,
-        "eventsLateArrivalMaxDelayInSeconds": 5,
-        "dataLocale": "en-US",
-        "inputs": [
-          {
-            "name": "datapoints",
-            "properties": {
-              "datasource": {
-                "properties": {
-                  "iotHubNamespace": "[variables('iothubname')]",
-                  "sharedAccessPolicyKey": "[listkeys(resourceId('Microsoft.Devices/IotHubs/IotHubKeys',variables('iothubname'), 'iothubowner'),'2016-02-03').primaryKey]",
-                  "sharedAccessPolicyName": "iothubowner",
-                  "endpoint": "messages/events",
-                  "consumerGroupName": "streaming"
-                },
-                "type": "Microsoft.Devices/IotHubs"
-              },
-              "serialization": {
-                "properties": {
-                  "encoding": "UTF8"
-                },
-                "type": "Json"
-              },
-              "type": "Stream"
-            }
-          }
-        ],
-        "transformation": {
-          "name": "Transformation",
-          "properties": {
-            "streamingUnits": 1,
-            "query": "SELECT\r\n    DeviceId = datapoints.iothub.connectionDeviceId,\r\n    'wind' = AVG(windSpeed),\r\n    'humidity' = AVG(humidity),\r\n    'min-W' = MIN(windSpeed),\r\n    'min-H' = MIN(humidity),\r\n    'max-W' = MAX(windSpeed),\r\n    'max-H' = MAX(humidity),\r\n    WindowEndTime = (System.Timestamp)\r\nINTO\r\n   [blobstorage]\r\nFROM\r\n    [datapoints]\r\n    TIMESTAMP BY\r\n        datapoints.iothub.enqueuedTime\r\nGROUP BY\r\n    datapoints.iothub.connectionDeviceId,\r\n    TumblingWindow(second, 30)"
-          }
-        },
-        "outputs": [
-          {
-            "name": "blobstorage",
-            "properties": {
-              "datasource": {
-                "type": "Microsoft.Storage/Blob",
-                "properties": {
-                  "storageAccounts": [
-                    {
-                      "accountName": "[parameters('storageAccount')]",
-                      "accountKey": "[parameters('storageKey')]"
-                    }
-                  ],
-                  "container": "datapoints",
-                  "pathPattern": "year={datetime:yyyy}/month={datetime:MM}/day={datetime:dd}/hour={datetime:HH}"
-                }
-              },
-              "serialization": {
-                "properties": {
-                  "encoding": "UTF8"
-                },
-                "type": "Json"
-              }
-            }
-          }
-        ]
-      }
     }
   ],
   "outputs": {
@@ -192,18 +93,6 @@
       "value": {
         "id": "[variables('IotHubId')]",
         "keys": "[listKeys(resourceId('Microsoft.Devices/IotHubs', variables('IotHubName')), '2016-02-03')]"
-      }
-    },
-    "dps": {
-      "type": "object",
-      "value": {
-        "id": "[variables('DpsId')]"
-      }
-    },
-    "asa": {
-      "type": "object",
-      "value": {
-        "id": "[variables('AnalyticsJobId')]"
       }
     }
   }
