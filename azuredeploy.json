@@ -7,7 +7,7 @@
       "metadata": {
         "description": "Small unique string."
       },
-      "defaultValue": "eastus2"
+      "defaultValue": "usgovvirginia"
     },
     "group": {
       "type": "string",
