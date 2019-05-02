@@ -19,12 +19,8 @@ if [ -z $PREFIX ]; then
 fi
 
 if [ -z $AZURE_LOCATION ]; then
-  AZURE_LOCATION="centralus"
+  AZURE_LOCATION="usgovtexas"
 fi
-
-# if [ -z $AZURE_GROUP ]; then
-#   AZURE_GROUP="iot-resources"
-# fi
 
 if [ -z $ORGANIZATION ]; then
   ORGANIZATION="testonly"
