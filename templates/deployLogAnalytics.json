@@ -5,10 +5,9 @@
     "location": {
       "type": "string",
       "allowedValues": [
-        "eastus",
-        "westus"
+        "usgovvirginia"
       ],
-      "defaultValue": "eastus",
+      "defaultValue": "usgovvirginia",
       "metadata": {
         "description": "Specifies the location in which to create the workspace."
       }

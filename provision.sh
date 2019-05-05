@@ -19,12 +19,8 @@ if [ -z $PREFIX ]; then
 fi
 
 if [ -z $AZURE_LOCATION ]; then
-  AZURE_LOCATION="centralus"
+  AZURE_LOCATION="usgovtexas"
 fi
-
-# if [ -z $AZURE_GROUP ]; then
-#   AZURE_GROUP="iot-resources"
-# fi
 
 if [ -z $ORGANIZATION ]; then
   ORGANIZATION="testonly"
@@ -73,15 +69,13 @@ tput setaf 3; echo "------------------------------------" ; tput sgr0
 
 VAULT=$(az keyvault list --resource-group $AZURE_GROUP --query [].name -otsv)
 HUB=$(az iot hub list --resource-group $AZURE_GROUP --query [].name -otsv)
-DPS=$(az iot dps list --resource-group $AZURE_GROUP --query [].name -otsv)
-DPS_GROUP=$AZURE_GROUP
+AZURE_GROUP=$AZURE_GROUP
 
 cat > .envrc << EOF
 # Azure Resources
 export VAULT="${VAULT}"
 export HUB="${HUB}"
-export DPS="${DPS}"
-export DPS_GROUP="${DPS_GROUP}"
+export AZURE_GROUP="${AZURE_GROUP}"
 
 # Certificate Authority
 export ORGANIZATION="testonly"
