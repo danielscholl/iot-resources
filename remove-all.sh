@@ -4,6 +4,13 @@
 #  Usage:
 #    remove-all.sh
 
+if [ -f ./.envrc ]; then source ./.envrc; fi
+
+if [ ! -z $1 ]; then PREFIX=$1; fi
+if [ -z $PREFIX ]; then
+  PREFIX="iot"
+fi
+AZURE_GROUP="$PREFIX-resources"
 
 # Remove the Resource Group
 printf "\n"
@@ -15,7 +22,7 @@ az deployment delete \
   -oyaml
 
 az group delete \
-  --name $DPS_GROUP \
+  --name $AZURE_GROUP \
   --yes \
   --no-wait
 
