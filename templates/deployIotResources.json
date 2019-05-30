@@ -256,7 +256,7 @@
           "dependsOn": [
             "[concat('Microsoft.TimeSeriesInsights/environments/', variables('TSIName'))]",
             "[concat('Microsoft.Devices/IotHubs/', variables('IotHubName'))]",
-            "[concat('Microsoft.Devices/iotHubs/eventhubEndpoints/ConsumerGroups', variables('TSIConsumerGroup'))]"
+            "[concat('Microsoft.Devices/iotHubs/eventhubEndpoints/ConsumerGroups/', variables('TSIConsumerGroup'))]"
           ],
           "properties": {
             "eventSourceResourceId": "[variables('IotHubId')]",
