@@ -13,6 +13,21 @@
       "metadata": {
         "description": "Diagnostics Storage Account Key"
       }
+    },
+    "timeSeriesId": {
+      "type": "array",
+      "metadata": {
+        "description": "Time Series ID acts as a partition key for your data and as a primary key for your time series model. It is important that you specify the appropriate Time Series Property ID during environment creation, since you can’t change it later. Note that the Property ID is case sensitive. You can use 1-3 keys: one is required, but up to three can be used to create a composite."
+      },
+      "defaultValue": "deviceId"
+    },
+    "timeSeriesTimeStamp": {
+      "type": "string",
+      "defaultValue": "",
+      "maxLength": 90,
+      "metadata": {
+        "description": "The event property that will be used as the event source's timestamp. If a value isn't specified for timestampPropertyName, or if null or empty-string is specified, the event creation time will be used."
+      }
     }
   },
   "variables": {
@@ -26,7 +41,9 @@
     "DpsId": "[resourceId('Microsoft.Devices/provisioningServices', variables('DpsName'))]",
     "AnalyticsJobName": "[concat('asa', uniqueString(resourceGroup().id))]",
     "AnalyticsJobId": "[resourceId('Microsoft.StreamAnalytics/StreamingJobs', variables('AnalyticsJobName'))]",
-    "ConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccount'), ';AccountKey=', parameters('storageKey'))]"
+    "ConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccount'), ';AccountKey=', parameters('storageKey'))]",
+    "TSIName": "[concat('tsi', uniqueString(resourceGroup().id))]",
+    "TSIId": "[resourceId('Microsoft.TimeSeriesInsights/Environments', variables('TSIName'))]"
   },
   "resources": [
     {
@@ -140,7 +157,7 @@
       ],
       "properties": {
         "sku": {
-          "name": "standard"
+          "name": "Standard"
         },
         "outputErrorPolicy": "stop",
         "eventsOutOfOrderPolicy": "adjust",
@@ -205,6 +222,47 @@
           }
         ]
       }
+    },
+    {
+      "comments": "## Time Series Insights ##",
+      "type": "Microsoft.TimeSeriesInsights/environments",
+      "name": "[variables('TSIName')]",
+      "apiVersion": "2018-08-15-preview",
+      "location": "[resourceGroup().location]",
+      "kind": "LongTerm",
+      "properties": {
+        "storageConfiguration": {
+          "accountName": "[parameters('storageAccount')]",
+          "managementKey": "[parameters('storageKey')]"
+        },
+        "timeSeriesIdProperties": "[parameters('timeSeriesId')]"
+      },
+      "sku": {
+        "name": "L1",
+        "capacity": 1
+      },
+      "resources": [
+        {
+          "type": "eventSources",
+          "name": "iot_hub",
+          "apiVersion": "2018-08-15-preview",
+          "location": "[resourceGroup().location]",
+          "kind": "Microsoft.IoTHub",
+          "dependsOn": [
+            "[concat('Microsoft.TimeSeriesInsights/environments/', variables('TSIName'))]",
+            "[concat('Microsoft.Devices/IotHubs/', variables('IotHubName'))]",
+            "[concat('Microsoft.Devices/IotHubs/', variables('IotHubName'), '/eventHubEndpoints/events/ConsumerGroups/', variables('TSIConsumerGroup'))]"
+          ],
+          "properties": {
+            "eventSourceResourceId": "[variables('IotHubId')]",
+            "iotHubName": "[variables('IoTHubName')]",
+            "consumerGroupName": "[variables('TSIConsumerGroup')]",
+            "keyName": "service",
+            "sharedAccessKey": "[listkeys(resourceId('Microsoft.Devices/IoTHubs/IotHubKeys', variables('IoTHubName'), 'service'), '2018-04-01').primaryKey]",
+            "timestampPropertyName": "[parameters('timeSeriesTimeStamp')]"
+          }
+        }
+      ]
     }
   ],
   "outputs": {
@@ -225,6 +283,12 @@
       "type": "object",
       "value": {
         "id": "[variables('AnalyticsJobId')]"
+      }
+    },
+    "tsi": {
+      "type": "object",
+      "value": {
+        "id": "[variables('TSIId')]"
       }
     }
   }
