@@ -18,8 +18,8 @@
   "variables": {
     "storageAccountName": "[concat('data', uniqueString(resourceGroup().id))]",
     "storageId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-    "isHnsEnabled": "yes",
-    "supportsHttpsTrafficOnly": "yes"
+    "isHnsEnabled": true,
+    "supportsHttpsTrafficOnly": true
   },
   "resources": [
     {
@@ -30,7 +30,8 @@
       "location": "[resourceGroup().location]",
       "kind": "StorageV2",
       "sku": {
-        "name": "[parameters('storageAccountType')]"
+        "name": "[parameters('storageAccountType')]",
+        "tier": "Standard"
       },
       "properties": {
         "accessTier": "Hot",
