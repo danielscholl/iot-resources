@@ -17,7 +17,9 @@
   },
   "variables": {
     "storageAccountName": "[concat('data', uniqueString(resourceGroup().id))]",
-    "storageId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+    "storageId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+    "isHnsEnabled": "yes",
+    "supportsHttpsTrafficOnly": "yes"
   },
   "resources": [
     {
@@ -28,11 +30,12 @@
       "location": "[resourceGroup().location]",
       "kind": "StorageV2",
       "sku": {
-        "name": "[parameters('storageAccountType')]",
-        "tier": "Standard"
+        "name": "[parameters('storageAccountType')]"
       },
       "properties": {
-        "accessTier": "Hot"
+        "accessTier": "Hot",
+        "supportsHttpsTrafficOnly": "[variables('supportsHttpsTrafficOnly')]",
+        "isHnsEnabled": "[variables('isHnsEnabled')]"
       },
       "resources": [
         {
@@ -53,6 +56,14 @@
         },
         {
           "name": "[concat('default/', 'datapoints')]",
+          "type": "blobServices/containers",
+          "apiVersion": "2018-07-01",
+          "dependsOn": [
+            "[variables('storageAccountName')]"
+          ]
+        },
+        {
+          "name": "[concat('default/', 'conversion')]",
           "type": "blobServices/containers",
           "apiVersion": "2018-07-01",
           "dependsOn": [

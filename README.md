@@ -1,6 +1,6 @@
 # iot-resources
 
-The purpose of this solution is to be able to test x509 certificates using x509 certs signed by an Intermediate CA.  It uses the base script provided in the azure-iot-sdk but heavily modified which is a solution _not recommended_ to be used in a production scenario and used for testing purposes only.
+The purpose of this solution is to deploy resources necessary for an IoT Solution
 
 
 __PreRequisites__
@@ -39,6 +39,8 @@ This script will generate the following resources in Azure.
 1. Application Insights
 
 1. Stream Analytics
+
+1. Time Series Insights
 
 ```bash
 # Provision the ARM Resources
