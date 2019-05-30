@@ -18,8 +18,8 @@
   "variables": {
     "storageAccountName": "[concat('data', uniqueString(resourceGroup().id))]",
     "storageId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-    "isHnsEnabled": true,
-    "supportsHttpsTrafficOnly": true
+    "isHnsEnabled": false,
+    "supportsHttpsTrafficOnly": false
   },
   "resources": [
     {
