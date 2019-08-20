@@ -39,7 +39,7 @@ if [ -z $INT_CA_PASSWORD ]; then
 fi
 
 USER_ID=$(az ad user show \
-        --upn-or-object-id $(az account show --query user.name -otsv) \
+        --id $(az account show --query user.name -otsv) \
         --query objectId -otsv)
 
 
