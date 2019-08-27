@@ -15,11 +15,11 @@ if [ -f ./.envrc ]; then source ./.envrc; fi
 
 if [ ! -z $1 ]; then PREFIX=$1; fi
 if [ -z $PREFIX ]; then
-  PREFIX="iot"
+  PREFIX="pp"
 fi
 
 if [ -z $AZURE_LOCATION ]; then
-  AZURE_LOCATION="centralus"
+  AZURE_LOCATION="westus"
 fi
 
 # if [ -z $AZURE_GROUP ]; then
