@@ -40,7 +40,7 @@ fi
 
 USER_ID=$(az ad user show \
         --id $(az account show --query user.name -otsv) \
-        --query objectId -otsv)
+        --query id -otsv)
 
 
 ##############################
