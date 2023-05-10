@@ -5,7 +5,7 @@ default_ca = CA_default
 
 [ CA_default ]
 # Directory and file locations.
-org               = testonly          # ORGANIZATION VALUE HERE
+org               = $ENV::ORGANIZATION          # ORGANIZATION VALUE HERE
 dir               = pki
 certs             = $dir/certs
 crl_dir           = $dir/crl
